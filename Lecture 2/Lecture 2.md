@@ -10,11 +10,11 @@ To make this process easier, Arduino was introduced.
 Arduino is an open-source electronics platform designed to simplify working with microcontrollers. Instead of building the full circuit from scratch, Arduino provides ready-made boards that already include the important components needed to run and program a microcontroller.   
 Most Arduino boards are built around microcontrollers such as the ATmega328P. The board includes power regulation, communication circuits, and connection pins. Because of this, we only need to connect the board to a computer and start programming.   
 
-<img src="arduino.png" height="250px"/>
+<img src="./attachments/arduino.png" height="250px"/>
 
 What makes Arduino even more powerful is that it comes with many components and kits that make creating prototypes and small projects very easy for everyone. These kits allow beginners to start experimenting and building real systems without needing advanced knowledge. The components are designed to be easy to connect and wire with Arduino, which reduces complexity and helps learners focus on understanding the concepts and developing their ideas
 
-<img src="kits.png" height="350px" />
+<img src="./attachments/kits.png" height="350px" />
 
 Another important strength of Arduino is its large and active community. Students, hobbyists, engineers, and makers from all around the world share projects, tutorials, and solutions. This makes learning easier because beginners can find help, examples, and inspiration online. One of the best places to explore these ideas is the official Arduino project website: [Arduino Project Hub](https://projecthub.arduino.cc/).
 
@@ -23,41 +23,45 @@ Arduino is an open-source platform. Because of this, many manufacturers have cop
 We can find different types of Arduino boards. Each type is designed for a specific use, depending on the project size, power, and required features.
 #### Arduino Uno
 The **Arduino Uno** is the most popular and recognizable board in the Arduino family, making it the definitive starting point for beginners. Powered by the 8-bit ATmega328P microcontroller, it features 14 digital input/output pins, 6 analog inputs, and a standard, robust USB-B connection. Its larger footprint is intentionally designed to easily accept "shields" (stackable add-on boards for things like motors or displays), which makes prototyping straightforward without needing to solder. If you are just starting your electronics journey, this is the classic, heavily documented, and foolproof choice
-<img src="arduino.png"  height="250px"/>
+<img src="./attachments/arduino.png"  height="250px"/>
+
 #### Arduino Nano
 The **Arduino Nano** packs almost exactly the same capabilities as the Uno into a much smaller, breadboard-friendly form factor. Usually based on the same ATmega328P chip, it drops the standard barrel power jack and bulky USB port in favor of a Mini-B or Micro-USB connection (and USB-C on newer iterations). Because its pins point downwards, you can plug it directly into a prototyping breadboard. This makes it the go-to choice for permanent, soldered circuits or space-constrained projects where the Uno would simply be too bulky.
 
-<img src="arduino_nano.png" height="250px" />
+<img src="./attachments/arduino_nano.png" height="250px" />
+
 #### Arduino Mega
 The **Arduino Mega 2560** is the heavy lifter of the classic Arduino lineup, designed specifically for complex projects that require a massive amount of hardware connections or code memory. It uses the larger ATmega2560 microcontroller, which provides a staggering 54 digital I/O pins, 16 analog inputs, and four times the flash memory of the Uno. This board is traditionally used in demanding, hardware-heavy applications like custom 3D printers, multi-servo robotics, and complex home automation systems where a standard Uno runs out of pins.
 
-<img src="arduino_mega.png" height="250px" />
+<img src="./attachments/arduino_mega.png" height="250px" />
 
 #### Arduino Leonardo
 The **Arduino Leonardo** looks physically similar to the Uno but has a fundamental difference under the hood: it uses the ATmega32U4 microcontroller. This specific chip features built-in USB communication, meaning it doesn't need a secondary, separate chip to talk to your computer like the Uno does. Because of this direct line of communication, the Leonardo can natively emulate computer peripherals. You can program it to be recognized by your PC as a standard USB mouse or keyboard, making it ideal for building custom game controllers, macro pads, or flight simulator panels.
 
-<img src="arduino_leonardo.png" height="250px" />
+<img src="./attachments/arduino_leonardo.png" height="250px" />
 
 #### Arduino Micro
 Think of the **Arduino Micro** as the Leonardo's smaller sibling, much like how the Nano relates to the Uno. Developed in conjunction with Adafruit, it features the exact same ATmega32U4 chip as the Leonardo, giving it the identical ability to act natively as a USB mouse, keyboard, or MIDI device. However, all of this is shrunk down into a compact, breadboard-friendly design. It is the perfect choice for embedding into small, custom PC input devices or wearables where you need USB emulation but a full-sized Leonardo just won't fit.
 
-<img src="arduino_micro.png" height="250px" />
+<img src="./attachments/arduino_micro.png" height="250px" />
 
 #### Arduino Due
 The **Arduino Due** was a massive milestone as the first Arduino board to feature a powerful 32-bit ARM core microcontroller (the Cortex-M3). While it shares a similarly large footprint and the massive 54 digital I/O and 12 analog pin count of the Mega, it absolutely crushes older 8-bit boards in raw performance, boasting an 84 MHz clock speed and significantly more memory. It also includes advanced hardware like two DACs (for true analog output, great for audio) and two CAN buses. However, it comes with a critical catch: **it operates strictly at 3.3V**. Pushing the standard 5V used by the Uno or Mega into the Due's pins will permanently damage the board. This makes it a powerhouse for experienced makers building complex, high-speed applications like CNC controllers, advanced robotics, or real-time data acquisition, provided you carefully manage your voltage levels.
 
-<img src="arduino_due.png" height="250px" />
+<img src="./attachments/arduino_due.png" height="250px" />
 
 #### Arduino MKR Series
 Rather than a single board, the **Arduino MKR Series** is an entire family of compact microcontrollers designed specifically to dominate the Internet of Things (IoT). Sharing a standardized, breadboard-friendly footprint, almost all MKR boards are powered by a 32-bit ARM Cortex-M0+ processor and include built-in charging circuits for lithium-polymer (LiPo) batteries, making them ready for off-grid use out of the box. What sets the series apart is that you simply choose the specific board based on how you want to communicate: the MKR WiFi 1010 handles standard Wi-Fi and Bluetooth, the MKR WAN 1310 uses LoRa for long-range remote networks, and the MKR GSM 1400 taps directly into cellular networks. If you are building battery-powered smart home devices, remote agricultural sensors, or any project that needs to talk securely to the cloud, this 3.3V family is your modern, professional-grade toolkit.
 
-<img src="arduino_mkr_1010.png"  height="250px"/>
+<img src="./attachments/arduino_mkr_1010.png"  height="250px"/>
+
 #### Arduino UNO R4
 The **Arduino UNO R4** is the newest generation of the classic Arduino Uno and represents a big improvement over the older versions, upgrading from the old 8-bit chip to a highly capable 32-bit ARM Cortex-M4 microcontroller (the Renesas RA4M1). This upgrade brings drastically faster processing speeds, up to 16 times more memory,  In addition, the Uno R4 includes modern features such as a built-in CAN bus for reliable communication in automotive and industrial systems, and a true digital-to-analog converter (DAC) that can generate smooth analog signals and even simple audio without extra hardware. all while maintaining the classic Uno pin layout so your old shields still fit. It comes in two flavors:    
 The Minima version focuses on simplicity and performance, making it a good choice for learning and general electronics.    
 The WiFi version adds wireless connectivity using a secondary chip based on the ESP32 and a built-in 12x8 LED matrix right on the board.
 
-<img src="arduino_R4_wifi.png" height="250px"/>
+<img src="./attachments/arduino_R4_wifi.png" height="250px"/>
+
 #### Arduino UNO Q
 The **Arduino UNO Q** is not just another upgrade to the Uno lineup it is a complete reinvention of what an Arduino board can be. While it keeps the familiar Uno form factor and shield compatibility, the UNO Q combines a full Linux single-board computer with a real-time microcontroller on the same PCB. At its core is the powerful Qualcomm Dragonwing QRB2210 quad-core processor running Debian Linux for high-level computing, paired with an STM32U585 microcontroller from STMicroelectronics for precise, real-time control of GPIO, sensors, and actuators. This hybrid design means we can run Python, AI models, web servers, and image processing on Linux while simultaneously running traditional Arduino sketches for time-critical hardware tasks.  
 Wireless connectivity is built in, offering dual-band Wi-Fi 5 and Bluetooth 5.1, and the board includes 2 GB RAM with 16 GB of onboard eMMC storage. It features USB-C for power, data, and even video output, an 8×13 LED matrix display, RGB status LEDs, a user button, and a Qwiic connector for plug-and-play I²C modules. Despite all this computing power, it maintains the classic Uno header layout with 14 digital pins and 6 analog inputs (3.3V logic, 5V-tolerant digital pins), so many existing shields still work.
@@ -358,11 +362,12 @@ It has two legs:
 #### Wiring
 We start by building the circuit. Connect the long leg (anode) of the LED to digital pin 13 on the Arduino (through a resistor). Then connect the short leg (cathode) of the LED to the GND pin on the Arduino.
 
-<img src="circuit_led.png" height="350px"/>
+<img src="./attachments/circuit_led.png" height="350px"/>
+
 #### Creating the Program
 Now let’s program the Arduino board to make the LED blink. First, we connect the Arduino to our computer using a USB cable. After that, we open the Arduino IDE. Then, check if our computer has detected the Arduino board. If it has, select the board so we can upload the program.
 
-<img src="set_ide.png" />
+<img src="./attachments/set_ide.png" />
 
 We used pin 13 as an output pin, we sending signals from the Arduino to turn the LED on and off.  
 In the `setup()` function, we configure pin 13 as an OUTPUT using `pinMode()`. 
@@ -380,7 +385,7 @@ void loop() {
 ```
 Now we verify the program by clicking the Verify button to check for any errors in the code. If the code is correct, we then upload it to the Arduino by clicking the Upload button. This sends the program to the board.
 
-<img src="verify_upload.png" />
+<img src="./attachments/verify_upload.png" />
 
 We will notice that our LED turns on and stays on. This means we have done only half of the work. Now, we need to make it stay on for a short period and then turn off for a short period. By repeating this process, we will make it blink.   
 To do this, we use the `delay()` function, which pauses (or freezes) the program for a specific number of milliseconds.  
@@ -407,12 +412,14 @@ Inside the breadboard, the holes are connected in specific patterns:
 - **Central gap:**  The middle gap separates the two sides of the breadboard. This gap is designed to place integrated circuits (ICs) so that their pins do not connect to each other by mistake.
 
 <img src="./attachments/Beardboard.png" />
+
 #### Push Button
 A push button is a simple input component that allows us to control a circuit by pressing it. When the button is **not pressed**, the internal contacts are open, so no current flows. When we press the button, the contacts close and allow current to pass through.
 
 Inside the push button, the pins that are facing each other are internally connected. This means the two pins on one side are connected together, and the two pins on the opposite side are also connected. When the button is pressed, both sides become connected.
 
-<img src="push_button.png" />
+<img src="./attachments/push_button.png" />
+
 #### Wiring
 For this project, we will need 1 LED, 1 push button and 2 resistors (220Ω), First, connect the **GND** and **5V (VCC)** pins from the Arduino board to the **power rails** of the breadboard. This allows us to easily access power and ground anywhere on the board.  
 Next, place the LED on the breadboard:
@@ -431,7 +438,7 @@ Now, place the push button on the breadboard .
 We use a pull-down resistor to make sure the Arduino reads a stable and correct signal from the push button. When the button is not pressed, the input pin of the Arduino is not connected to anything, so it becomes floating. A floating pin can randomly read HIGH or LOW because of electrical noise, which can cause the LED to behave unpredictably.   
 The pull-down resistor connects the input pin to **GND** when the button is not pressed, forcing it to read LOW in a stable way. When the button is pressed, the pin connects to **5V** and reads HIGH. This makes the button work reliably and also protects the circuit from unwanted current.
 
-<img src="circuit.png" />
+<img src="./attachments/circuit.png" />
 
 #### Creating The Program
 First, we connect the Arduino to our computer using a USB cable. and set the Arduino IDE so we can upload the program.  

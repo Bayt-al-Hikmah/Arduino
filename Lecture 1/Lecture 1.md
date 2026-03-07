@@ -8,11 +8,12 @@ We live in the electric century. Everywhere we look around us, we see electrical
 To Understand electricity lets start by diving deep into the building blocks of our universe. We know that matter, and everything around us, is composed of atoms. These atoms themselves are made of three basic building blocks: electrons, protons, and neutrons. Protons are positively charged, and electrons are negatively charged. The protons and neutrons are located in the center of the atom, called the nucleus, while the electrons move around it in a cloud-like region.   
 In the normal state of an atom, the number of electrons is equal to the number of protons, which makes the atom neutral in charge. However, atoms can undergo physical changes where they lose or gain electrons. When this happens, they become positively or negatively charged.
 
-<img src="atom.png" height="250px">
+<img src="./attachments/atom.png" height="250px">
+
 ### Static Electiricty
 Humanity discovered electricity thousands of years ago. One of the most powerful natural examples of electricity is lightning. During a storm, electric charges separate inside a cloud. The top of the cloud becomes positively charged, while the bottom becomes negatively charged. The negative charge at the bottom pushes electrons away from the ground, making the ground positively charged. This creates a strong electric field between the cloud and the Earth. When the electric field becomes strong enough, the air can no longer block the charges. Electricity suddenly flows between the cloud and the ground. This fast movement of electrons produces the bright flash we see as lightning.     
 
-<img src="lightning.png"/>
+<img src="./attachments/lightning.png"/>
 
 Another early encounter with electricity happened when people rubbed two materials together. This process creates a charged surface: one object becomes negatively charged by gaining electrons, while the other becomes positively charged by losing electrons. When we bring two objects with the same type of charge close to each other, they repel one another. On the other hand, when we bring materials with opposite charges together, they attract each other. The force of attraction and repulsion between charges can be described by a physical law and expressed using a mathematical equation.
 $$F = \frac{k \times (q_1 \times q_2)}{ r^2}$$
@@ -22,7 +23,7 @@ $$F = \frac{k \times (q_1 \times q_2)}{ r^2}$$
 - **r** = the distance between the charges (in meters)
 
 
-<img src="static_electricity.png">
+<img src="./attachments/static_electricity.png">
 
 Through many experiments, scientists discovered that materials behave in consistent ways when they become charged. Some materials tend to gain electrons and become negatively charged, while others tend to lose electrons and become positively charged.
 ### Electricity
@@ -50,6 +51,7 @@ $$2H_3O^+ + 2e^- \rightarrow 2H_2O + H_2$$​
 
 This continuous movement of electrons through the wire is what we call electric current. By controlling this chemical reaction and the path of the electrons, we can generate a steady flow of electricity, which is the basic principle behind many batteries.
 <img src="./attachments/batery.png">
+
 ### Electricity and Magnetism
 Electricity and magnetism were not always known to be connected. Electricity was about moving charges, while magnetism was only associated with special materials like iron and natural magnets. This changed in the 19th century when scientists began to notice surprising interactions between electric currents and magnetic forces.
 
@@ -85,6 +87,7 @@ In conductors, such as copper, aluminum, and silver, outer electrons are free to
 In contrast, insulators such as rubber, plastic, glass, and dry wood behave very differently. In these materials, electrons are tightly bound to their atoms and cannot move freely. When an electric field is applied, the electrons only shift slightly but do not travel through the material. As a result, almost no current flows. This is why insulators are used to protect us from electric shocks and to cover wires, preventing electricity from escaping.
 
 <img src="./attachments/insulator.png" />
+
 ### Current, Potential, and Resistance
 To study electricity and electrical phenomena, we focus on three main concepts: electric current, electric potential, and resistance. These ideas help us understand how electricity moves, why it moves, and what can slow it down or control it.
 #### Electric Current
@@ -119,6 +122,7 @@ If we connect an energy source so that the positive terminal is on the p-side an
 However, if we reverse the connection, the barrier increases. Electrons are pulled away from the junction, and very few can cross, so almost no current flows. This the basic idea behind many semiconductor devices. One of the simplest and most important examples is the diode, which allows electric current to flow in only one direction. 
 
 <img src="./attachments/Diode.png"/>
+
 ## Electric Circuits: From Basic Connections to Microcontrollers
 Now we understand what electricity is, where it comes from, how it is generated, and how different materials react when an electrical current passes through them. Let’s move to the next step: using electricity to power materials and build useful devices and tools.
 ### Electric Circuit
@@ -131,7 +135,7 @@ A basic electric circuit usually has three main parts
 2. **Conductors (wires)**  which allow the current to travel through the circuit.
 3. **Load** the device that uses electrical energy, such as a lamp, motor, or heater.
 
-<img src="electric_circuit.png" height="300px"/>
+<img src="./attachments/electric_circuit.png" height="300px"/>
 
 When we connect electrical components in a circuit, we can arrange them in different ways. The two most common types of wiring are series and parallel. Each type has different properties and uses.
 #### Series Wiring
@@ -141,14 +145,14 @@ Because there is only one path for the current, all components share the same cu
 
 One important characteristic of a series circuit is that if one component stops working or the circuit is broken at any point, the whole circuit stops. This means all devices turn off. 
 
-<img src="series_wiring.png" height="250px" />
+<img src="./attachments/series_wiring.png" height="250px" />
 
 #### Parallel Wiring
 In a parallel circuit, the components are connected across the same two points of the power source. This creates multiple paths for the electric current.   
 In this case, each component receives the same voltage, but the current is divided between the different paths. Because of this, each device can work independently.  
 If one component stops working, the others continue to operate. For example, in modern houses, if one lamp burns out, the rest of the lights still work.
 
-<img src="parallel_wiring.png" height="350px"/>
+<img src="./attachments/parallel_wiring.png" height="350px"/>
 
 ### Designing Circuits
 We have explored how to create basic electric circuits, and we discovered the difference between series and parallel wiring. These ideas do not apply only to loads and components like lamps or motors. We can also use series and parallel wiring when we design the control parts of a circuit, such as switches.
@@ -156,12 +160,13 @@ We have explored how to create basic electric circuits, and we discovered the di
 #### Switches in Series
 When switches are connected in series, the electric current must pass through all of them. This means every switch must be closed for the circuit to work. If any switch is open, the current stops and the device turns off.  
 This type of design is useful when we want several conditions to be met before a device operates. For example, safety systems often use series switches. 
-![[seris_switches.png]]
+<img src="./attachments/seris_switches.png" />
 
 #### Switches in Parallel
 When switches are connected in parallel, the current has more than one path. This means that closing any one of the switches will complete the circuit and turn the device on.   
 This design is useful when we want to control the same device from different locations. A common example is the lighting system in large rooms, corridors, or staircases, where a lamp can be turned on or off from more than one place.
-![[parallel_switch.png]]
+
+<img src="./attachments/parallel_switch.png" />
 
 #### Control and Conditional Circuits
 We can do much more with electrical circuits than simply turning devices on and off. By combining different components such as semiconductors, sensors, and control elements, we can create more complex circuits. These circuits can perform logical operations, make decisions, and produce specific output voltages or currents based on certain conditions.
@@ -172,7 +177,8 @@ For example, a light sensor can detect darkness and turn on a lamp without human
 
 Semiconductors play a key role in this process. Devices such as transistors act as electronic switches or amplifiers, allowing circuits to operate quickly and reliably. 
 
-![[auto_light.png]]
+<img src="./attachments/auto_light.png" />
+
 Here example of an automatic night light that turns on a lamp when the surrounding area becomes dark. It uses a light sensor called an LDR (Light Dependent Resistor) to detect the level of light. When there is enough light, the LDR has low resistance, which prevents the transistor from turning on, so the lamp stays off. When it becomes dark, the resistance of the LDR increases, allowing a small current to reach the base of the transistor. The transistor then acts as an electronic switch and allows current to flow from the battery to the lamp. The resistor in the circuit helps control the current and adjusts the sensitivity of the sensor.
 #### Integrated Circuits
 When we move from simple experiments to real-world products, our circuits must become smaller, faster, and more reliable. Building large systems from many separate components requires more space, more wiring, and increases the risk of failure. To overcome these challenges, engineers developed integrated circuits, which combine many electronic components into a single, compact device.
@@ -183,12 +189,13 @@ An integrated circuit provides external pins (or terminals) that allow us to con
 
 Inputs are signals that come from sensors, switches, or other circuits. The IC processes these signals using its internal electronic components and logic. It then produces outputs that can drive LEDs, motors, displays, or other devices. In this way, an integrated circuit functions like a “black box”: we provide inputs, it processes the information internally, and it delivers the desired outputs.
 
-<img src="IC.png" />
+<img src="./attachments/IC.png" />
+
 ### Microcontrollers
 As systems became more complex, engineers began to face some limitations with traditional integrated circuits. Although ICs are powerful and reliable, they are often designed to perform a specific task. They operate like a “black box,” meaning we usually cannot access or modify their internal behavior. If we need to change even a small function, improve performance, or add new features, we often must redesign the entire circuit or develop a new chip. This process is expensive, time-consuming, and not practical for many modern applications where flexibility is important.  
 To overcome these limitations, engineers developed microcontrollers. A microcontroller is a special type of integrated circuit that contains a small computer inside a single chip. Instead of being fixed for one task, a microcontroller can be programmed to perform different functions depending on the needs of the system. This makes it much more flexible and adaptable than traditional ICs.   
 The basic structure of a microcontroller includes three main parts. First, it has a processor (CPU), which is the “brain” of the system and is responsible for executing instructions. Second, it contains memory, where programs and data are stored. This memory usually includes flash memory for the program and RAM for temporary data. Third, it includes input and output (I/O) ports that allow the microcontroller to communicate with sensors, switches, motors, displays, and other electronic components. Many microcontrollers also include built-in peripherals such as timers, communication modules, and analog-to-digital converters, which simplify the design of electronic systems.
 
-<img src="micro_controller.png" />
+<img src="./attachments/micro_controller.png" />
 
 Microcontrollers are programmed using software. Engineers write a program, usually in languages such as C or Python, and upload it to the microcontroller using a computer. This program tells the microcontroller how to read inputs, process information, and control outputs. If the system requirements change, we only need to modify the program and upload a new version, without redesigning the hardware.

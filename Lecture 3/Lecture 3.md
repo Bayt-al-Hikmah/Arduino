@@ -10,7 +10,7 @@ In total, an Arduino UNO board has 20 GPIO pins, which are divided into two main
 The Arduino board has 14 digital GPIO pins, which are located on the right side of the board. These pins can handle only two states: HIGH and LOW. This means they can either send or receive digital signals, such as turning an LED on or off, or reading the state of a button.    
 Each digital pin can be configured as either an input or an output, depending on the requirements of the circuit. When set as an input, the pin reads signals from external components. When set as an output, it sends signals to control devices.
 
-<img src="Digital_GPIO.png" height="350px" />
+<img src="./attachments/Digital_GPIO.png" height="350px" />
 
 #### Digital GPIO Functions
 The Arduino provides several functions that allow us to control and use digital pins easily.   
@@ -41,7 +41,7 @@ There are two main types of buzzers:
 
 Let’s build a simple project where an LED blink and buzzer produces sound, when a push button is pressed.     
 We start by making the circuit, we can use the circuit of the previous lecture, we just add the active buzzer we connect it to pin 2.  
-<img src="buzzer_circuit.png" />
+<img src="./attachments/buzzer_circuit.png" />
 
 Now, let’s create our program.  
 First, we start with the **`setup()`** function. Here, we configure the pins:
@@ -83,7 +83,7 @@ Ultrasonic sensors are one of the most useful sensors used with Arduino. They he
 The same idea applies when exploring a cave. An adventurer might shout and listen for the echo. The time it takes for the echo to come back gives an idea of how far away the cave walls are.   
 
 In a similar way, an ultrasonic sensor such as the HC-SR04 Ultrasonic Sensor sends out high-frequency sound waves and measures how long it takes for the echo to return. Using this time, the Arduino calculates the distance to an object.
-<img src="ultrasonic.png"/>
+<img src="./attachments/ultrasonic.png"/>
 
 Let’s create a project where we use **three LEDs** to indicate distance:
 - The red LED turns on when the object is 60 cm or more away.
@@ -101,7 +101,7 @@ The HC-SR04 Ultrasonic Sensor has four pins:
 3. Trig (Trigger) → Used to send the ultrasonic pulse, we connect it to Pin 8
 4. Echo → Used to receive the reflected signal, we connect it to Pin 7
 
-<img src="ultrasomic_circuit.png" />
+<img src="./attachments/ultrasomic_circuit.png" />
 
 After finishing the circuit, it is time to write the program.
 
@@ -199,7 +199,7 @@ The Arduino digital pins provide an output voltage of 5V or 3.3V, depending on t
 However, when we want to build larger projects, we may need to control devices that require higher voltage or higher current, such as lamps, fans, pumps, or motors. The Arduino pins cannot supply enough power for these devices directly, and connecting them without protection may damage the board.   
 To solve this problem, we use relays. A relay is an electrically controlled switch that allows a low-power signal from the Arduino to control high-power devices safely. Inside the relay, there is a coil that plays a key role. When the Arduino sends a control signal, a small current flows through the coil, which produces a magnetic field. This magnetic field pulls a metal armature, causing the internal switch to close and allowing current to flow in the high-power circuit. When the Arduino stops sending the signal, the current in the coil stops, the magnetic field disappears, and a spring pushes the armature back to its original position, opening the switch again.
 
-<img src="relay.png" />
+<img src="./attachments/relay.png" />
 
 Let’s build a simple project using a relay and an ultrasonic sensor. In this project, we will use the ultrasonic sensor to turn a light ON when the user passes their hand in front of the sensor, and turn it OFF when the user passes their hand again.   
 
@@ -222,7 +222,7 @@ Control Side, Low Voltage:
 
 When the relay is activated, the internal switch closes between COM and NO (Normally Open), allowing current to flow and turning the lamp ON. At the same time, the connection between COM and NC (Normally Closed) is opened. When the relay is deactivated, the opposite happens.
 
-<img src="relay_cicuit.png" />
+<img src="./attachments/relay_cicuit.png" />
 
 Now let’s create the program for our project. As always, we start with the **`setup()`** function, where we configure the pins. 
 We set Pin 10** (Trig) and Pin 8 (relay control) as output pins, and Pin 9 (Echo) as an input pin:
@@ -299,12 +299,12 @@ $$Duty\ Cycle (\%) = \frac{value}{255} \times 100 $$
 By adjusting this value, we directly control the duty cycle, which controls the average voltage applied to the connected device.
 $$V_{average}​=\frac{value}{255}​×V_{max}​$$
 
-<img src="PWM.png" />
+<img src="./attachments/PWM.png" />
 
 ### Analogue GPIO Pins
 The Arduino board has 6 analogue input pins (A0–A5), located on the left side of the board. Unlike digital pins, which can only read HIGH or LOW, analogue pins can read a continuous range of voltage values between 0V and 5V. This makes them ideal for working with sensors and components that produce varying signals, such as temperature sensors, light sensors, and potentiometers.
 
-<img src="Analogue_GPIO.png" height="350px" />
+<img src="./attachments/Analogue_GPIO.png" height="350px" />
 
 Each analogue pin is connected to a built-in Analogue-to-Digital Converter (ADC), which converts the incoming voltage into a digital value that the Arduino can process. The ADC has a 10-bit resolution, meaning it maps the input voltage to a value between **0** and **1023**.
 
@@ -329,7 +329,7 @@ Let’s build a project to control the brightness of an LED using a potentiomete
 First, connect the potentiometer’s two outer terminals to GND and 5V on the Arduino. Then, connect the middle terminal (wiper) of the potentiometer to the analog pin A0.  
 Next, connect the short leg of the LED (cathode) to GND, and the long leg (anode) to digital pin 9 through the 220 Ω resistor. We use pin 9 because it supports PWM, which allows us to simulate an analog signal to control the LED brightness smoothly.
 
-<img src="circuit_potentipmeters.png" />
+<img src="./attachments/circuit_potentipmeters.png" />
 
 Now, let’s write the program. In the **`setup()`** function, we configure pin 9 as an output. We do not strictly need to configure A0 as input because analog pins are set to input by default.
 ```cpp
@@ -381,7 +381,7 @@ Unlike a potentiometer, an LDR only has two terminals. To read its changing resi
 
 A voltage divider is a simple circuit made of two or more resistors connected in series. When we apply a voltage across them, the total voltage is divided between them according to their resistance values.   
 The output voltage is taken from the point between the two resistors, and its value depends on the ratio of the resistances.
-<img src="Voltage_divisor.png" />
+<img src="./attachments/Voltage_divisor.png" />
 
 The voltage divider equation is:
 $$V_1 =V_{in}\times \frac{R_1}{R_1+R_2}$$
@@ -390,7 +390,7 @@ Let’s build a project to create an automatic night light that turns on an LED 
 First, connect one leg of the LDR to 5V on the Arduino. Then, connect the other leg of the LDR to both the analog pin A0 and to one end of the 10k Ω resistor. Finally, connect the other end of the 10k Ω resistor to GND.
 
 Next, connect the short leg of the LED (cathode) to GND, and the long leg (anode) to digital pin 7 through the 220 Ω resistor. We will use pin 7 as a simple digital output to turn the LED on or off.
-<img src="Ldr_circuit.png" />
+<img src="./attachments/Ldr_circuit.png" />
 With this circuit, the voltage at pin **A0** is the output voltage of the voltage divider, which depends on the LDR’s resistance. Since the LDR is a variable resistor, its resistance changes according to the light intensity.
 - When **light intensity increases**, the **resistance of the LDR decreases**, which causes the output voltage at A0 to decrease .
 - When **light intensity decreases (darkness)**, the **resistance increases**, which causes the output voltage at A0 to increase.
@@ -545,19 +545,20 @@ Motors do not come in only one form. There are **many different types of motors*
 The standard Direct Current (DC) motor is the most common type of motor we will encounter. It provides continuous rotational motion.   
 A DC motor works on the principle of electromagnetism (Lorentz force principle). Inside the motor, there is a coil of wire (the armature) placed between the poles of a permanent magnet. When an electric current flows through the coil, it generates a magnetic field that pushes against the permanent magnet, causing the coil to spin. A mechanical component called a "commutator" constantly reverses the current direction to keep the motor spinning continuously in one direction. The speed of the motor depends on the supplied voltage, and the direction of rotation depends on the polarity of the voltage applied to the motor terminals.
 
-<img src="Dc_motor.png" />
+<img src="./attachments/Dc_motor.png" />
 
 
 An Arduino digital pin can only supply about 20 mA of current, which can't directly power most DC motors . We must use a Motor Driver (like the L298N or L293D) or Transistor circuit to power and control the motor.   
 The drivers is integrated circuit that contain an "H-Bridge" circuit, which allows us to safely provide high current from an external battery and easily reverse the motor's direction.  
 
-<img src="H_bridge.PNG" />
+<img src="./attachments/H_bridge.PNG" />
 
 To use a DC motor with an L298N motor driver, we connect the motor to the driver's output terminals. After that we connect the driver's power pins to a battery and ground. Then, connect the driver's control pins to the Arduino.
 - **IN1 and IN2** control the rotation direction. We set one **HIGH** and the other **LOW** to select the direction.
 - **ENA** controls the motor speed using PWM.
 
 <img src="./attachments/circuit_Dc.PNG" />
+
 the program will be as following
 ```cpp
 int ENA = 9; // PWM pin for speed control
@@ -580,13 +581,13 @@ void loop() {
 ### Servo Motor
 A servo motor doesn't spin continuously like a regular DC motor. Instead, it is designed for precise positioning. Standard hobby servos can rotate to a specific angle, usually between 0 and 180 degrees. They are perfect for steering mechanisms, robotic arms, and camera gimbals.
 
- A servo is a "closed-loop" system. Inside its casing, there is a small DC motor, a gearbox to slow it down and increase torque, and a potentiometer (variable resistor) connected to the output shaft. As the motor turns, the potentiometer turns with it, constantly measuring the current angle and feeding that information back to an internal control circuit. The control circuit receives a PWM control signal and compares the desired position with the current position measured by the potentiometer. if the positions are different, the motor rotates until the correct angle is reached.
+A servo is a "closed-loop" system. Inside its casing, there is a small DC motor, a gearbox to slow it down and increase torque, and a potentiometer (variable resistor) connected to the output shaft. As the motor turns, the potentiometer turns with it, constantly measuring the current angle and feeding that information back to an internal control circuit. The control circuit receives a PWM control signal and compares the desired position with the current position measured by the potentiometer. if the positions are different, the motor rotates until the correct angle is reached.
 
-![[Servo_motor.png]]
+<img src="./attachments/Servo_motor.png" />
 
 The Servo motor have 3 pins ,Gnd VCC and control pins where we send the PWM signals, Arduino have  built-in Servo library, that simplify for us controlling the servo motor, Let's make simple circuit to see how that work, we start with connecting the servo's Red wire to 5V, Brown/Black wire to GND, and Yellow/Orange wire to a PWM pin (like Pin 9). 
 
-<img src="servo_circuit.png" />
+<img src="./attachments/servo_circuit.png" />
 
 
 In the program, we first include the **Servo** library and create a **Servo object**. Inside the **setup()** function, we attach the servo to **pin 9**. Finally, inside the **loop()** function, we use the **write()** function to specify the position that the servo motor should move to.
@@ -611,7 +612,7 @@ Brushless DC motors are high-performance motors known for their incredible speed
 
 In a standard DC motor, the permanent magnets are on the outside (stator) and the electromagnet coils spin on the inside (rotor). A BLDC motor flips this design: the coils remain stationary on the outside, and a permanent magnet spins on the inside. Because there is no mechanical commutator to switch the current in the coils, an external electronic controller must rapidly switch the power to the coils in a precise sequence to drag the magnetic rotor around. This switching creates a rotating magnetic field that causes the rotor to spin.  
 A BLDC motor typically has three input wires, which correspond to the three stator phases (often labeled A, B, and C). Each wire connects to one set of coils inside the motor.  
-<img src="BLDC.png" />
+<img src="./attachments/BLDC.png" />
 
 BLDC motor requires an Electronic Speed Controller (ESC). The ESC handles the heavy lifting of switching the high-current phases at incredibly fast speeds. The ESC receives a control signal that represents the desired motor speed. Using power transistors (usually MOSFETs), it rapidly switches the DC supply between the motor’s three windings. This switching sequence energizes the coils one after another, which produces a rotating magnetic field that causes the rotor magnets to follow and spin.  
 To control the speed, the ESC uses Pulse Width Modulation (PWM). By adjusting the width of the pulses, the ESC controls how much power is delivered to the motor. Wider pulses supply more power and increase the speed, while narrower pulses reduce power and slow the motor down. In many systems, the ESC also monitors feedback (such as back EMF) from the motor to maintain smooth and efficient operation.
@@ -621,7 +622,7 @@ Let’s build a simple project to control a brushless motor using an Arduino. Fo
 First, connect the GND and VCC (5V) wires from the ESC control cable to the Arduino GND and 5V pins. Then connect the signal (control) wire from the ESC to Arduino pin 9, which will send the PWM signal used to control the motor speed. Next, connect the battery to the ESC’s power input to supply the required power. Finally, connect the three wires of the brushless motor to the three output wires of the ESC. These wires correspond to the three motor phases and allow the ESC to drive the motor by switching the current between them.
 
 
-<img src="Brushless_circuit.png" />
+<img src="./attachments/Brushless_circuit.png" />
 
 For the program, we can use the Servo library to control the brushless motor.  Setting the servo value to 180 degrees gives the motor full speed, while setting it to 0 degrees will stop the motor. Other values between **0 and 180** control the motor speed gradually.
 
@@ -647,11 +648,11 @@ For more control over our brushless motor, we can use the `esc.writeMicroseconds
  A stepper motor is a motor that rotates in small precise steps instead of continuous rotation, each electrical pulse moves the motor by a fixed angle. If a motor has a 1.8-degree step angle, it takes exactly 200 steps to make one full revolution. They are excellent for precise positioning without needing feedback, making them the backbone of 3D printers and CNC machines.  
 A stepper motor contains a central, toothed, gear-like magnetic rotor surrounded by multiple electromagnetic coils (stators) organized into "phases." By energizing these coils one by one in a specific sequence, the teeth of the rotor are magnetically pulled into alignment with the energized coil, causing the motor to step forward by a fraction of a degree.
 
-<img src="Stepper_motor.png"/>
+<img src="./attachments/Stepper_motor.png"/>
 
 Stepper motors, like brushless motors, require specialized drivers to operate correctly. The driver acts as the “brain” between the control system (arduino) and the motor itself. It receives control signals, usually in the form of step pulses and direction commands, and translates them into precise sequences of electrical signals that energize the motor coils in the proper order. The driver controls which coils are energized at each moment, ensuring the rotor moves incrementally and precisely to the desired position. Some drivers also provide features like current limiting, microstepping (dividing steps into smaller increments for smoother motion), and protection against overheating. Common stepper motor drivers include the A4988, DRV8825, and ULN2003 
 
-<img src="driverr.png" />
+<img src="./attachments/driverr.png" />
 The A4988 driver has 16 pins, usually arranged in two rows: one for motor power and one for control logic. Here’s what each pin does:
 - **VMOT** Connects to the motor power supply (typically 8–35 V). Powers the stepper motor coils.
 - **GND (next to VMOT)** Connects to the negative terminal of the motor power supply.
@@ -678,7 +679,7 @@ The A4988 driver has 16 pins, usually arranged in two rows: one for motor power 
 Let’s make a simple example using a 12 V stepper motor and a stepper motor driver A4988. We start by connecting the stepper motor coil 1 to the A1 & B1 pins on the driver and coil 2 to the B1 & B2 pins. Next, we connect VMOT to the 12 V battery positive terminal and GND to the battery negative terminal.   
 After that, we start connecting the driver to the Arduino. We connect the GND pin at the bottom of the driver to the Arduino GND, the VDD to Arduino 5 V, and finally we connect the DIR pin and the STEP pin to the Arduino pins 7 and 8.
 
-<img src="step_circuit.png" />
+<img src="./attachments/step_circuit.png" />
 
 Now let’s create a simple program to control our stepper motor. We start by configuring pins 8 and 7 as output pins inside the `setup()` function. After that, we can control the motor inside the `loop()` function.
 
