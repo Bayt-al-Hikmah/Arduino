@@ -40,7 +40,8 @@ There are two main types of buzzers:
 - Passive buzzer: This type does not have a built-in oscillator. Instead, it allows us to generate sound at different frequencies by sending signals from the Arduino. This gives us more control over the tone, which makes it possible to play melodies or different alert sounds.
 
 Let’s build a simple project where an LED blink and buzzer produces sound, when a push button is pressed.     
-We start by making the circuit, we can use the circuit of the previous lecture, we just add the active buzzer we connect it to pin 2.  
+We start by making the circuit, we can use the circuit of the previous lecture, we just add the active buzzer we connect it to pin 2. 
+
 <img src="./attachments/buzzer_circuit.png" />
 
 Now, let’s create our program.  
@@ -83,6 +84,7 @@ Ultrasonic sensors are one of the most useful sensors used with Arduino. They he
 The same idea applies when exploring a cave. An adventurer might shout and listen for the echo. The time it takes for the echo to come back gives an idea of how far away the cave walls are.   
 
 In a similar way, an ultrasonic sensor such as the HC-SR04 Ultrasonic Sensor sends out high-frequency sound waves and measures how long it takes for the echo to return. Using this time, the Arduino calculates the distance to an object.
+
 <img src="./attachments/ultrasonic.png"/>
 
 Let’s create a project where we use **three LEDs** to indicate distance:
@@ -283,6 +285,7 @@ For example (assuming a 5V system):
 - If the output stays ON for half of the period (50% duty cycle), the average voltage will be **2.5V**.
 
 $$ V_{average}​=\frac{T_{on}}{T_{Off}}   \times V_{max}​ = DutyCycle \times V_{max}​ $$
+
 To work with PWM in Arduino, we first configure the desired pin as an output inside the `setup()` function:
 ```
 void setup(){
@@ -381,6 +384,7 @@ Unlike a potentiometer, an LDR only has two terminals. To read its changing resi
 
 A voltage divider is a simple circuit made of two or more resistors connected in series. When we apply a voltage across them, the total voltage is divided between them according to their resistance values.   
 The output voltage is taken from the point between the two resistors, and its value depends on the ratio of the resistances.
+
 <img src="./attachments/Voltage_divisor.png" />
 
 The voltage divider equation is:
@@ -390,7 +394,9 @@ Let’s build a project to create an automatic night light that turns on an LED 
 First, connect one leg of the LDR to 5V on the Arduino. Then, connect the other leg of the LDR to both the analog pin A0 and to one end of the 10k Ω resistor. Finally, connect the other end of the 10k Ω resistor to GND.
 
 Next, connect the short leg of the LED (cathode) to GND, and the long leg (anode) to digital pin 7 through the 220 Ω resistor. We will use pin 7 as a simple digital output to turn the LED on or off.
+
 <img src="./attachments/Ldr_circuit.png" />
+
 With this circuit, the voltage at pin **A0** is the output voltage of the voltage divider, which depends on the LDR’s resistance. Since the LDR is a variable resistor, its resistance changes according to the light intensity.
 - When **light intensity increases**, the **resistance of the LDR decreases**, which causes the output voltage at A0 to decrease .
 - When **light intensity decreases (darkness)**, the **resistance increases**, which causes the output voltage at A0 to increase.
@@ -476,6 +482,7 @@ There are different types of sensors, but we can divide them into two main group
 - **Capacitance-based** sensors measure the dielectric permittivity of the soil. The presence of water changes this permittivity, which alters the sensor's capacitance.
 
 <img src ="soil_sensor.png" />
+
 The capacitive soil moisture sensor usually has three pins: VCC, GND, and OUT.
 - **VCC** is used to power the sensor.
 - **GND** is connected to ground.
@@ -612,6 +619,7 @@ Brushless DC motors are high-performance motors known for their incredible speed
 
 In a standard DC motor, the permanent magnets are on the outside (stator) and the electromagnet coils spin on the inside (rotor). A BLDC motor flips this design: the coils remain stationary on the outside, and a permanent magnet spins on the inside. Because there is no mechanical commutator to switch the current in the coils, an external electronic controller must rapidly switch the power to the coils in a precise sequence to drag the magnetic rotor around. This switching creates a rotating magnetic field that causes the rotor to spin.  
 A BLDC motor typically has three input wires, which correspond to the three stator phases (often labeled A, B, and C). Each wire connects to one set of coils inside the motor.  
+
 <img src="./attachments/BLDC.png" />
 
 BLDC motor requires an Electronic Speed Controller (ESC). The ESC handles the heavy lifting of switching the high-current phases at incredibly fast speeds. The ESC receives a control signal that represents the desired motor speed. Using power transistors (usually MOSFETs), it rapidly switches the DC supply between the motor’s three windings. This switching sequence energizes the coils one after another, which produces a rotating magnetic field that causes the rotor magnets to follow and spin.  
@@ -653,6 +661,7 @@ A stepper motor contains a central, toothed, gear-like magnetic rotor surrounded
 Stepper motors, like brushless motors, require specialized drivers to operate correctly. The driver acts as the “brain” between the control system (arduino) and the motor itself. It receives control signals, usually in the form of step pulses and direction commands, and translates them into precise sequences of electrical signals that energize the motor coils in the proper order. The driver controls which coils are energized at each moment, ensuring the rotor moves incrementally and precisely to the desired position. Some drivers also provide features like current limiting, microstepping (dividing steps into smaller increments for smoother motion), and protection against overheating. Common stepper motor drivers include the A4988, DRV8825, and ULN2003 
 
 <img src="./attachments/driverr.png" />
+
 The A4988 driver has 16 pins, usually arranged in two rows: one for motor power and one for control logic. Here’s what each pin does:
 - **VMOT** Connects to the motor power supply (typically 8–35 V). Powers the stepper motor coils.
 - **GND (next to VMOT)** Connects to the negative terminal of the motor power supply.

@@ -22,7 +22,8 @@ Arduino is an open-source platform. Because of this, many manufacturers have cop
 ### Type Of Arduino
 We can find different types of Arduino boards. Each type is designed for a specific use, depending on the project size, power, and required features.
 #### Arduino Uno
-The **Arduino Uno** is the most popular and recognizable board in the Arduino family, making it the definitive starting point for beginners. Powered by the 8-bit ATmega328P microcontroller, it features 14 digital input/output pins, 6 analog inputs, and a standard, robust USB-B connection. Its larger footprint is intentionally designed to easily accept "shields" (stackable add-on boards for things like motors or displays), which makes prototyping straightforward without needing to solder. If you are just starting your electronics journey, this is the classic, heavily documented, and foolproof choice
+The **Arduino Uno** is the most popular and recognizable board in the Arduino family, making it the definitive starting point for beginners. Powered by the 8-bit ATmega328P microcontroller, it features 14 digital input/output pins, 6 analog inputs, and a standard, robust USB-B connection. Its larger footprint is intentionally designed to easily accept "shields" (stackable add-on boards for things like motors or displays), which makes prototyping straightforward without needing to solder. If you are just starting your electronics journey, this is the classic, heavily documented, and foolproof choice.
+
 <img src="./attachments/arduino.png"  height="250px"/>
 
 #### Arduino Nano
@@ -75,7 +76,7 @@ Despite there being many types of Arduino boards, they all share the same basic 
 
 To understand how the Uno works, we need to break down its core components:
 
-<img src="arduino_structure.png" height="350px"/>
+<img src="./attachments/arduino_structure.png" height="350px"/>
 
 #### Microcontroller
 The microcontroller is the brain of the Arduino Uno. It is a small computer on a single chip that runs the program we upload to the board. It reads inputs from sensors, processes the information, and sends outputs to devices such as LEDs, motors, or displays.
@@ -139,6 +140,12 @@ Example:
 ```
 char letter = 'A';  // ASCII value 65
 ```
+#### ``String``
+Represents a sequence of characters (text) like "Hello" or "Arduino".   
+Example:
+```
+String message = "Hello Arduino";
+```
 #### `int`
 Represents **integer numbers** (whole numbers without decimals), such as `5`, `-10`, or `0`.
 - Typically 2 bytes on Arduino Uno.
@@ -147,6 +154,18 @@ Represents **integer numbers** (whole numbers without decimals), such as `5`, `-
 Example:
 ```
 int count = 10;
+```
+Numbers can be written in different numeral systems, not only decimal.
+- Decimal (base 10) normal numbers like 10, 25, 100.
+- Binary (base 2) prefixed with ``0b``.
+- Octal (base 8) prefixed with ``0``.
+- Hexadecimal (base 16) prefixed with ``0x``.
+
+```
+int count = 10;      // decimal
+int bin   = 0b1010;  // binary (10 in decimal)
+int oct   = 012;     // octal (10 in decimal)
+int hex   = 0xA;     // hexadecimal (10 in decimal)
 ```
 #### `long`
 Used for larger integer numbers than `int`.
@@ -189,11 +208,16 @@ void blinkLED() {
   // This function does not return a value  
 }
 ```
+#### Other Integer Types
+Besides int and long, Arduino supports smaller or specialized integer types.
+- ``short`` A smaller integer type.
+- ``unsigned`` Removes the negative range and allows larger positive values.
+- ``byte`` Very common in Arduino to create variable that hold one byte in memory
+
 #### Arrays
 Arrays are **collections of variables** of the same type stored together.  
 - Elements are accessed using **indices**, starting from `0`.
 - Arrays can hold integers, characters, or other data types.
-    
 
 Examples:
 ```
@@ -201,6 +225,33 @@ int numbers[] = {4, 5, 7};           // int array
 char message[] = "hello";            // char array (string)  
 char name[] = {'A', 'l', 'i'};       // char array
 ```
+### Data Types Table
+
+| Type             | Memory                        | Value Range                     |
+| ---------------- | ----------------------------- | ------------------------------- |
+| `bool`           | 1 byte                        | `true` or `false`               |
+| `char`           | 1 byte                        | -128 to 127                     |
+| `unsigned char`  | 1 byte                        | 0 to 255                        |
+| `byte`           | 1 byte                        | 0 to 255                        |
+| `short`          | 2 bytes                       | -32,768 to 32,767               |
+| `unsigned short` | 2 bytes                       | 0 to 65,535                     |
+| `int`            | 2 bytes                       | -32,768 to 32,767               |
+| `unsigned int`   | 2 bytes                       | 0 to 65,535                     |
+| `long`           | 4 bytes                       | -2,147,483,648 to 2,147,483,647 |
+| `unsigned long`  | 4 bytes                       | 0 to 4,294,967,295              |
+| `float`          | 4 bytes                       | ~ ±3.4 × 10³⁸                   |
+| `double`         | 4 bytes (Uno) / 8 bytes (Due) | higher precision                |
+| `String`         | variable                      | depends on text length          |
+| `void`           | 0 bytes                       | no value                        |
+| `int8_t`         | 1 byte                        | -128 → 127                      |
+| `uint8_t`        | 1 byte                        | 0 → 255                         |
+| `int16_t`        | 2 bytes                       | -32,768 → 32,767                |
+| `uint16_t`       | 2 bytes                       | 0 → 65,535                      |
+| `int32_t`        | 4 bytes                       | -2,147,483,648 → 2,147,483,647  |
+| `uint32_t`       | 4 bytes                       | 0 → 4,294,967,295               |
+| `int64_t`        | 8 bytes                       | very large                      |
+| `uint64_t`       | 8 bytes                       | very large                      |
+
 ### Constants
 A **constant** is a variable whose value cannot change while the program runs.  We use uppercase letters for constants to make them easy to identify in code.
 There are two ways to define constants:

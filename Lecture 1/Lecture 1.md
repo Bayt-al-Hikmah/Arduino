@@ -50,6 +50,7 @@ At the copper side, these electrons are transferred to the hydronium ions in the
 $$2H_3O^+ + 2e^- \rightarrow 2H_2O + H_2$$​
 
 This continuous movement of electrons through the wire is what we call electric current. By controlling this chemical reaction and the path of the electrons, we can generate a steady flow of electricity, which is the basic principle behind many batteries.
+
 <img src="./attachments/batery.png">
 
 ### Electricity and Magnetism
@@ -160,6 +161,7 @@ We have explored how to create basic electric circuits, and we discovered the di
 #### Switches in Series
 When switches are connected in series, the electric current must pass through all of them. This means every switch must be closed for the circuit to work. If any switch is open, the current stops and the device turns off.  
 This type of design is useful when we want several conditions to be met before a device operates. For example, safety systems often use series switches. 
+
 <img src="./attachments/seris_switches.png" />
 
 #### Switches in Parallel
