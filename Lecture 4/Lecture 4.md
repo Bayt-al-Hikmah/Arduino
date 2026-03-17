@@ -943,3 +943,61 @@ void loop() {
 }
 ```
 If an extra line appears after the received data is printed, it means the phone app is sending the message with a newline character. This can be changed in the app settings. Alternatively, in the Arduino program we can use ``readStringUntil('\n')``, which stops reading when it reaches the newline character.
+
+The good thing about the HC-05 and HC-06 Bluetooth Module is that it can be configured. We can change several settings such as the device name, password, and baud rate. These settings are modified using AT commands.  
+
+The HC-05 module is more advanced and supports many configuration commands. It can work in master mode or slave mode, which means it can either connect to another Bluetooth device or accept connections. Some useful commands include checking the connection with AT, reading or changing the device name using ``AT+NAME``, viewing the device address using ``AT+ADDR``, checking the firmware version using ``AT+VERSION``, changing the baud rate using ``AT+UART``, changing the role (master or slave) using ``AT+ROLE``, resetting the module using ``AT+RESET``, restoring factory settings with AT+ORGL, and changing the password using ``AT+PSWD``.
+
+The HC-06 module supports fewer commands because it works only as a slave device. However, it still allows some basic configuration. With AT commands we can check the connection using AT, change the device name using ``AT+NAME``, change the baud rate using ``AT+BAUD``, change the pairing password using ``AT+PIN``, and check the firmware version using ``AT+VERSION``. These commands are usually enough for most simple Bluetooth communication projects.
+
+Here simple example of program to configure the HC module, by using the Serial Monitor, any command typed in the Serial Monitor is sent to the Bluetooth module. The response from the module is then printed back to the Serial Monitor. This allows us to easily configure the module by sending AT commands.
+```cpp
+#include <SoftwareSerial.h>
+
+SoftwareSerial bluetooth(2, 3); 
+
+void setup() {
+
+  Serial.begin(9600);
+  bluetooth.begin(9600);   
+
+  Serial.println("Enter AT commands:");
+
+}
+
+void loop() {
+
+  // Send command from Serial Monitor to Bluetooth
+  if (Serial.available()) {
+    bluetooth.write(Serial.read());
+  }
+
+  // Show response from Bluetooth module
+  if (bluetooth.available()) {
+    Serial.write(bluetooth.read());
+  }
+
+}
+```
+Example of commands for HC-05
+```
+AT
+AT+NAME=MyBluetooth // will  set name
+AT+PSWD=1234 // will set password
+AT+UART=9600,0,0
+```
+If there was problem when sending the command using the serial monitor, try change it setting to send the message only and don't add new line after the command, this can be set from here.
+
+<img src="./attachments/monitor_bluetooth.png">
+
+#### Wi-Fi
+Wi-Fi is a wireless communication technology that allows devices to connect over a network instead of directly to each other. Unlike Bluetooth, which is mainly used for short-range point-to-point communication, Wi-Fi enables an Arduino to communicate over longer distances and even connect to the internet. This makes it ideal for IoT (Internet of Things) applications such as remote monitoring, smart home systems, and web-based control.
+
+
+At its core, a basic Arduino Wi-Fi module acts as a "wireless network bridge." It uses radio frequencies in the 2.4 GHz band to transmit and receive data over a network using standard network protocols like TCP/IP. When a command is sent from a web browser or an app over the Wi-Fi network, it travels to the router and then to the module. The module translates these complex network packets (TCP/IP) back into standard UART serial signals (RX and TX), which the Arduino can read exactly as if it were plugged in via a USB cable.
+
+Since the Arduino UNO does not have built-in Wi-Fi, we need an external module such as the ESP8266. This module  communicates with the Arduino using serial (UART), similar to the Bluetooth modules, but it adds full Wi-Fi networking capabilities, It can operate in Station (STA) mode to connect to an existing Wi-Fi router, Access Point (AP) mode to broadcast its own standalone Wi-Fi network, or both simultaneously.
+
+<img src="./attachments/esp_01pins.png" />
+
+
