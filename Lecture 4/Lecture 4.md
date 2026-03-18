@@ -942,15 +942,15 @@ void loop() {
 
 }
 ```
-If an extra line appears after the received data is printed, it means the phone app is sending the message with a newline character. This can be changed in the app settings. Alternatively, in the Arduino program we can use ``readStringUntil('\n')``, which stops reading when it reaches the newline character.
+If an extra line appears after the received data is printed, that means the phone app is sending the message with a newline character. This can be changed in the app settings. Alternatively, in the Arduino program we can use ``readStringUntil('\n')``, which stops reading when it reaches the newline character.
+#### Debug and Configure The Bluetooth module
+The good thing about the HC-05 and HC-06 Bluetooth Module is that they can be configured. We can change several settings such as the device name, password, and baud rate. These settings are modified using AT commands.  
 
-The good thing about the HC-05 and HC-06 Bluetooth Module is that it can be configured. We can change several settings such as the device name, password, and baud rate. These settings are modified using AT commands.  
+The HC-05 module is more advanced and supports many configuration commands. Some useful commands include checking the connection with ``AT``, reading or changing the device name using ``AT+NAME``, viewing the device address using ``AT+ADDR``, checking the firmware version using ``AT+VERSION``, changing the baud rate using ``AT+UART``, changing the role (master or slave) using ``AT+ROLE``, resetting the module using ``AT+RESET``, restoring factory settings with AT+ORGL, and changing the password using ``AT+PSWD``.
 
-The HC-05 module is more advanced and supports many configuration commands. It can work in master mode or slave mode, which means it can either connect to another Bluetooth device or accept connections. Some useful commands include checking the connection with AT, reading or changing the device name using ``AT+NAME``, viewing the device address using ``AT+ADDR``, checking the firmware version using ``AT+VERSION``, changing the baud rate using ``AT+UART``, changing the role (master or slave) using ``AT+ROLE``, resetting the module using ``AT+RESET``, restoring factory settings with AT+ORGL, and changing the password using ``AT+PSWD``.
+The HC-06 module supports fewer commands because it works only as a slave device. However. With AT commands we can check the connection using ``AT``, change the device name using ``AT+NAME``, change the baud rate using ``AT+BAUD``, change the pairing password using ``AT+PIN``, and check the firmware version using ``AT+VERSION``.  
 
-The HC-06 module supports fewer commands because it works only as a slave device. However, it still allows some basic configuration. With AT commands we can check the connection using AT, change the device name using ``AT+NAME``, change the baud rate using ``AT+BAUD``, change the pairing password using ``AT+PIN``, and check the firmware version using ``AT+VERSION``. These commands are usually enough for most simple Bluetooth communication projects.
-
-Here simple example of program to configure the HC module, by using the Serial Monitor, any command typed in the Serial Monitor is sent to the Bluetooth module. The response from the module is then printed back to the Serial Monitor. This allows us to easily configure the module by sending AT commands.
+Here simple example of program to configure the HC module, by using the Serial Monitor, any command typed in the Serial Monitor is sent to the Bluetooth module. The response from the module is then printed back to the Serial Monitor.  
 ```cpp
 #include <SoftwareSerial.h>
 
@@ -960,13 +960,11 @@ void setup() {
 
   Serial.begin(9600);
   bluetooth.begin(9600);   
-
   Serial.println("Enter AT commands:");
 
 }
 
 void loop() {
-
   // Send command from Serial Monitor to Bluetooth
   if (Serial.available()) {
     bluetooth.write(Serial.read());
@@ -976,7 +974,6 @@ void loop() {
   if (bluetooth.available()) {
     Serial.write(bluetooth.read());
   }
-
 }
 ```
 Example of commands for HC-05
@@ -991,13 +988,132 @@ If there was problem when sending the command using the serial monitor, try chan
 <img src="./attachments/monitor_bluetooth.png">
 
 #### Wi-Fi
-Wi-Fi is a wireless communication technology that allows devices to connect over a network instead of directly to each other. Unlike Bluetooth, which is mainly used for short-range point-to-point communication, Wi-Fi enables an Arduino to communicate over longer distances and even connect to the internet. This makes it ideal for IoT (Internet of Things) applications such as remote monitoring, smart home systems, and web-based control.
-
-
+Wi-Fi is a wireless communication technology that allows devices to connect over a network instead of directly to each other. Unlike Bluetooth, which is mainly used for short-range point-to-point communication, Wi-Fi enables an Arduino to communicate over longer distances and even connect to the internet. This makes it ideal for IoT (Internet of Things) applications such as remote monitoring, smart home systems, and web-based control.  
 At its core, a basic Arduino Wi-Fi module acts as a "wireless network bridge." It uses radio frequencies in the 2.4 GHz band to transmit and receive data over a network using standard network protocols like TCP/IP. When a command is sent from a web browser or an app over the Wi-Fi network, it travels to the router and then to the module. The module translates these complex network packets (TCP/IP) back into standard UART serial signals (RX and TX), which the Arduino can read exactly as if it were plugged in via a USB cable.
 
 Since the Arduino UNO does not have built-in Wi-Fi, we need an external module such as the ESP8266. This module  communicates with the Arduino using serial (UART), similar to the Bluetooth modules, but it adds full Wi-Fi networking capabilities, It can operate in Station (STA) mode to connect to an existing Wi-Fi router, Access Point (AP) mode to broadcast its own standalone Wi-Fi network, or both simultaneously.
 
 <img src="./attachments/esp_01pins.png" />
+
+
+Let’s create a simple project where we display weather data on an LCD using an API through Wi-Fi with the ESP-01 module. In this system, the ESP-01 connects to the internet, requests weather data from an API, sends the raw response to the Arduino through serial communication, and the Arduino extracts useful information (like temperature) and displays it on the LCD.
+
+First, Lets create the circuit we start by connecting the ESP-01 Wi-Fi module to the Arduino. The ESP-01 operates strictly on 3.3V logic, so its VCC must be connected to 3.3V, not 5V:
+- **VCC to 3.3V**
+- **CH_PD (or EN) to 3.3V**
+- **GND to GND**
+- **TX to Arduino RX (Pin 0)**
+- **RX to Arduino TX (Pin 1)**
+
+Next, we connect the  **I2C LCD display (16x2 with I2C module)** to reduce the number of pins:
+- **VCC to 5V**
+- **GND to GND**
+- **SDA to A4 (Arduino Uno)**
+- **SCL to A5 (Arduino Uno)**
+
+<img src ="./attachments/esp_project.png" />
+
+Now let’s create our program. The ESP-01 uses the UART protocol to communicate via AT commands, we start by initializing serial communication in the `setup()` function. We will send AT commands to connect to the Wi-Fi network, after that we initialize the I2C LCD.  
+Inside the `loop()` function, the Arduino requests weather data periodically. When the ESP-01 receives the response, it sends the raw JSON data back. We read this data, extract useful values , and display them on the LCD.
+
+```cpp
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+String receivedData = "";
+
+void setup() {
+  Serial.begin(115200); 
+  lcd.init();
+  lcd.backlight();
+  lcd.print("Connecting...");
+  
+  delay(1000);
+  
+  Serial.println("AT+CWMODE=1"); 
+  delay(1000);
+  Serial.println("AT+CWJAP=\"YourNetworkName\",\"YourPassword\""); // replace with your data
+  delay(5000);
+  lcd.clear();
+  lcd.print("WiFi Connected");
+}
+
+void loop() {
+  Serial.println("AT+CIPSTART=\"TCP\",\"api.openweathermap.org\",80");
+  delay(2000);
+  // Replace with your API key and city
+  String request = "GET /data/2.5/weather?q=London&appid=YOUR_API_KEY HTTP/1.1\r\nHost: api.openweathermap.org\r\n\r\n";
+  Serial.print("AT+CIPSEND=");
+  Serial.println(request.length());
+  delay(1000);
+  Serial.print(request);
+  delay(5000);
+
+  // Read response
+  if (Serial.available()) {
+    receivedData = Serial.readString();
+    int tempIndex = receivedData.indexOf("temp");
+    if (tempIndex != -1) { 
+      String tempValue = receivedData.substring(tempIndex + 6, tempIndex + 11);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Temp:");
+      lcd.setCursor(0, 1);
+      lcd.print(tempValue);
+    }
+  }
+  delay(10000); // Update every 10 seconds
+}
+```
+The ESP8266 is configured using AT commands same as the hC-05. In our Program First, we use `AT+CWMODE=1` to choose the connection mode, where 1 means Station mode, allowing the module to connect to an existing Wi-Fi network.
+
+After that, we use `AT+CWJAP` to establish the connection. We send the network name followed by a comma and then the password, so the ESP-01 can join the Wi-Fi.  
+Next, we use `AT+CIPSTART` to start a TCP connection with the weather server (`api.openweathermap.org`) on port 80. Then we use `AT+CIPSEND` to send the HTTP request that asks for the weather data.
+
+The module then sends back the response (in JSON format) through serial communication. To extract the temperature, we search for the keyword `"temp"` inside the received string. Once found, we shift 6 characters forward because the response format is like `"temp":23.45`, so the actual value starts right after `"temp":`. The `indexOf` function returns the index of the letter **t**, and with that shift, we can get the temperature value and display it on the I2C LCD.
+
+
+
+
+#### Debug and Configure The Wifi module
+The ESP-01 module is very advanced and supports a wide range of networking commands. It can operate in Station mode (STA) or Access Point mode (AP), which means it can either connect to our home router or create its own Wi-Fi network for other devices to connect to directly.
+
+Some useful commands include checking if the module is responding with `AT`, setting the Wi-Fi mode using `AT+CWMODE`, joining a network using `AT+CWJAP`, checking the assigned IP address using `AT+CIFSR`, enabling multiple connections with `AT+CIPMUX`, starting a server with `AT+CIPSERVER`, and resetting the module using `AT+RST`.
+
+We can test and explore these commands using the Serial Monitor. First, we change the wiring and use pins 2 and 3 for UART communication:
+- VCC with 3.3V
+- CH_PD with 3.3V
+- GND with GND
+- TX with Pin 2
+- RX with Pin 3
+
+After that, we create a simple sketch that allows us to send commands from the Serial Monitor and display the responses from the module:
+```cpp
+#include <SoftwareSerial.h>
+
+SoftwareSerial wifi(2, 3); 
+
+void setup() {
+  Serial.begin(9600);
+  wifi.begin(115200);   
+
+  Serial.println("Enter AT commands:");
+}
+
+void loop() {
+  // Send command from Serial Monitor to Wi-Fi module
+  if (Serial.available()) {
+    wifi.write(Serial.read());
+  }
+
+  // Show response from Wi-Fi module
+  if (wifi.available()) {
+    Serial.write(wifi.read());
+  }
+}
+```
+If random or garbled characters appear in the Serial Monitor, it usually means the baud rate of the ESP-01 is mismatched. While 115200 is standard, older firmware versions sometimes use 9600. We can change `wifi.begin(115200)` to `wifi.begin(9600)` to test this.
+
 
 
