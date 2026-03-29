@@ -1073,9 +1073,6 @@ Next, we use `AT+CIPSTART` to start a TCP connection with the weather server (`a
 
 The module then sends back the response (in JSON format) through serial communication. To extract the temperature, we search for the keyword `"temp"` inside the received string. Once found, we shift 6 characters forward because the response format is like `"temp":23.45`, so the actual value starts right after `"temp":`. The `indexOf` function returns the index of the letter **t**, and with that shift, we can get the temperature value and display it on the I2C LCD.
 
-
-
-
 #### Debug and Configure The Wifi module
 The ESP-01 module is very advanced and supports a wide range of networking commands. It can operate in Station mode (STA) or Access Point mode (AP), which means it can either connect to our home router or create its own Wi-Fi network for other devices to connect to directly.
 
