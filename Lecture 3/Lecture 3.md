@@ -481,7 +481,7 @@ There are different types of sensors, but we can divide them into two main group
 - **Resistance-based** devices have two exposed electrodes. As soil moisture increases, its conductivity increases, causing the electrical resistance between the electrodes to drop.
 - **Capacitance-based** sensors measure the dielectric permittivity of the soil. The presence of water changes this permittivity, which alters the sensor's capacitance.
 
-<img src ="soil_sensor.png" />
+<img src ="./attachments/soil_sensor.png" />
 
 The capacitive soil moisture sensor usually has three pins: VCC, GND, and OUT.
 - **VCC** is used to power the sensor.
@@ -558,13 +558,13 @@ A DC motor works on the principle of electromagnetism (Lorentz force principle).
 An Arduino digital pin can only supply about 20 mA of current, which can't directly power most DC motors . We must use a Motor Driver (like the L298N or L293D) or Transistor circuit to power and control the motor.   
 The drivers is integrated circuit that contain an "H-Bridge" circuit, which allows us to safely provide high current from an external battery and easily reverse the motor's direction.  
 
-<img src="./attachments/H_bridge.PNG" />
+<img src="./attachments/H_bridge.png" />
 
 To use a DC motor with an L298N motor driver, we connect the motor to the driver's output terminals. After that we connect the driver's power pins to a battery and ground. Then, connect the driver's control pins to the Arduino.
 - **IN1 and IN2** control the rotation direction. We set one **HIGH** and the other **LOW** to select the direction.
 - **ENA** controls the motor speed using PWM.
 
-<img src="./attachments/circuit_Dc.PNG" />
+<img src="./attachments/circuit_Dc.png" />
 
 the program will be as following
 ```cpp
