@@ -419,3 +419,348 @@ ISR(INT1_vect) {
 
 }
 ```
+## Functions :
+
+### Introduction :
+In previous lectures, we made basic sketches to control LEDs and read sensors. However, there are situations where we need to use a functionality multiple times like converting an analog sensor reading into a voltage. Copying and pasting the same code repeatedly makes our sketch unnecessarily large, consumes precious flash memory, and makes it harder to manage. To address this, we use functions. Functions allow us to convert blocks of code into reusable components, making our microcontroller programs more efficient and organized.
+
+### Create Functions :
+To create a function, we need to follow these steps:
+1. Identify the block of code that we want to turn into reusable code.
+2. Choose a descriptive function name.
+3. Identify the parameters that the function will need and their types.
+4. Identify the value that we want the function to return and its type.
+
+Let's start by creating a simple function that prints the state of pin 3 to the Serial Monitor.
+This function does not return any value and does not require any input parameters. Therefore, its return type will be `void`, and the parentheses will be empty.
+```cpp
+void printPin3State() {
+  int state = digitalRead(3);
+  Serial.println(state);
+}
+```
+Now, to use this function, we simply call it where we want to execute it. To call a function, we write its name followed by parentheses.
+```cpp
+void printPin3State() {
+  int state = digitalRead(3);
+  Serial.println(state);
+}
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(3, INPUT);
+}
+
+void loop() {
+  printPin3State();  // call the function
+  delay(1000);
+}
+``` 
+### Returning Value From Function
+To make a function more powerful and useful, we can allow it to return a value. To do this, we must specify the type of value the function will return. The return type is written before the function name.     
+Let’s build a simple function that reads the distance measured by an ultrasonic sensor and returns it as a value, we will connect the ultrasonic trig pin to arduino pin 9 and the ultrasonic echo pin to arduino pin 10.
+```cpp
+float readDistance(){
+  long duration;
+  float distance;
+  digitalWrite(9, LOW);
+  delayMicroseconds(2);
+  digitalWrite(9, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(9, LOW);
+  duration = pulseIn(10, HIGH);
+  distance = duration * 0.034 / 2;
+  return distance;
+}
+```
+Now we can call this function any time we want to retrieve the distance using the ultrasonic sensor.  
+### Functions With Parameters
+The `readDistance` function works well, but it has a limitation. The trigger and echo pins are predefined inside the function. This means that anyone who wants to use this function must connect the ultrasonic sensor to those exact pins. In other words, the function forces a specific hardware configuration.   
+To make the function more flexible and reusable, we can make the pins dynamic. Instead of defining them inside the function, we allow the user to specify which pins to use when calling the function,  This can be achieved by adding parameters to the function.   
+Parameters are declared inside the parentheses `()` of the function definition. For each parameter, we specify the data type followed by the parameter name. These parameters act like variables that receive the values passed when the function is called. Inside the function body, we can then use these parameters just like normal variables.
+
+```cpp
+float readDistance(int trigPin, int echoPin){ 
+	long duration; 
+	float distance; 
+	digitalWrite(trigPin, LOW); 
+	delayMicroseconds(2); 
+	digitalWrite(trigPin, HIGH); 
+	delayMicroseconds(10); 
+	digitalWrite(trigPin, LOW); 
+	duration = pulseIn(echoPin, HIGH); 
+	distance = duration * 0.034 / 2; 
+	return distance; 
+}
+```
+Now, when we call the function, we can specify which pins we are using.
+```cpp
+readDistance(2,3);
+```
+### Variables Scope :
+Inside the `readDistance` function, we created two variables: `duration` and `distance`. If we try to access the values of these variables inside the `loop()` or `setup` function, the compiler will generate an error.   
+This happens because these variables only exist inside the `readDistance` function. They are local variables, which means they are created in memory when the function starts executing and are destroyed from the microcontroller's memory as soon as the function finishes.
+#### Scope :
+In programming, scope refers to the region of a program where a particular variable or function can be accessed.
+- **Global scope:** Any variable created outside of `setup()`, `loop()`, or custom functions belongs to this scope. In Arduino, global variables are often used to store states (e.g., `int buttonPin = 2;`). They can be accessed anywhere in the program, but they consume SRAM constantly, so overusing them can limit available memory.
+- **Local scope:** A variable created inside a function or a block. It is stored temporarily on the stack memory and is freed when the function ends, which is efficient for microcontrollers. Local variables can only be accessed inside the function or block where they were created.  
+### Recursive Funtions :
+Recursive function are special function that have ability to call theirself untill a condition (that we call base state) is valid.  
+lets suppose we want to create a function that calculate factorial of numbers   
+we know that:
+
+- 0! is equal to 1
+- 1! is equal to 1
+- 4 is equal to 4\*3\*2\*1
+- 5! is equal to 5\*4\*3\*2\*1 = 5\*4!
+
+With that in mind, we can set the base condition as if ``n == 0`` we return 1, else we return n multiplied by the factorial of n-1 and so on
+```cpp
+int factorial(int n){
+	if (n == 0){
+		return 1;
+	}else{
+	return n * factorial(n - 1);
+	}
+}
+
+```
+Recursive functions can be very useful for implementing loops behaviour, but we must use them carefully.If a recursive function calls itself repeatedly without a proper stopping condition (base case), or if it is called too many times, it can lead to a stack overflow. This happens because each function call consumes memory on the stack, and exceeding the available stack memory will cause the program to crash.
+### Passing Arguments by Reference in Functions :
+When we pass a variable to a function, we are usually working with a copy of its value. This means that if we modify the variable inside the function, the original variable outside the function remains unchanged.  
+We can solve this problem by using pointers, which allow us to pass a reference to the variable instead of a copy. Instead of sending the value itself, we send the memory address of the variable. This allows the function to access and modify the original value stored in memory.   
+To create this type of parameter, we add `*` after the variable type in the function definition. Inside the function, we can dereference the pointer using the `*` operator to read or modify the value stored at that memory address.    
+Let’s edit the `readDistance` function. We will create the `duration` and `distance` variables outside the function as global variables, then pass them to the function so their values can be modified. This allows the function to update their values while also making them accessible and usable outside the function.
+```cpp
+void readDistance(int trigPin, int echoPin, long *duration, float *distance) {  
+digitalWrite(trigPin, LOW);  
+delayMicroseconds(2);  
+  
+digitalWrite(trigPin, HIGH);  
+delayMicroseconds(10);  
+digitalWrite(trigPin, LOW);  
+  
+*duration = pulseIn(echoPin, HIGH);  
+*distance = (*duration) * 0.034 / 2;  
+}
+```
+And now we can use this function as following
+```cpp
+long duration;  
+float distance;  
+  
+void readDistance(int trigPin, int echoPin, long *duration, float *distance) {  
+	digitalWrite(trigPin, LOW);  
+	delayMicroseconds(2);  
+	digitalWrite(trigPin, HIGH);  
+	delayMicroseconds(10);  
+	digitalWrite(trigPin, LOW);  
+	*duration = pulseIn(echoPin, HIGH);  
+	*distance = (*duration) * 0.034 / 2;  
+}  
+  
+void setup() {  
+	Serial.begin(9600);  
+	pinMode(9, OUTPUT);  
+	pinMode(10, INPUT);  
+}  
+  
+void loop() {  
+	readDistance(9, 10, &duration, &distance);    
+	Serial.print("Duration: ");  
+	Serial.print(duration);  
+	Serial.print(" us | Distance: ");  
+	Serial.print(distance);  
+	Serial.println(" cm");  
+	delay(500);  
+}
+```
+We can notice that when we call the function, we add `&` before the variable name. This is the address-of operator, and it allows us to access the memory address of the variable instead of its value.
+### Higher-Order Functions and Function Pointers 
+When we write functions, we usually pass standard data (like integers, floats, or pointers to variables) as arguments. However, we can also pass other functions as arguments. A function that accepts another function as a parameter, or returns a function as its result, is called a higher-order function.  
+We can achieve this by using function pointers. Just like a normal pointer holds the memory address of a variable, a function pointer holds the memory address of a function. This allows us to decide exactly which function to execute while the program is running, making our code highly flexible.  
+To create a pointer to a function, we must specify its return type, the pointer name enclosed in parentheses with a `*`, and the parameter types it accepts. For example: `void (*actionFunction)(int)` creates a pointer that can point to any function returning `void` and accepting an `int`.    
+Let’s look at a simple example where we create a higher-order function named `controlPin` that takes a pin number and a function pointer to dictate what happens to that pin.  
+```cpp
+void turnOn(int pin) {  
+  digitalWrite(pin, HIGH);
+  Serial.println("Pin is ON");
+}  
+void turnOff(int pin) {  
+  digitalWrite(pin, LOW);
+  Serial.println("Pin is OFF");
+}  
+
+// Higher-order function accepting a function pointer
+void controlPin(int pin, void (*action)(int)) {  
+  action(pin);  
+}
+
+void setup() {  
+  Serial.begin(9600);  
+  pinMode(13, OUTPUT);  
+}  
+  
+void loop() {  
+  controlPin(13, turnOn);    
+  delay(1000);  
+  controlPin(13, turnOff);  
+  delay(1000);  
+}
+```
+We can notice that when we call `controlPin`, we just pass the name of the function (`turnOn` or `turnOff`) without parentheses. In C++, the name of a function automatically acts as a pointer to its memory address, so we don't strictly need to use the `&` operator here.  
+
+We can Also retrun function from our function, this helpfull when we want  a main function that decides which function should run based on some condition (for example: a sensor value, a button press, or a command). This technique helps us create a **function selector**: a main function that chooses and returns the correct function to execute, We can create a function selector by first declaring the **return type** of the functions we intend to return, followed by the selector function's name (preceded by an asterisk `*` and wrapped in parentheses) along with the parameters the selector takes. Finally, we append the parameters that the returned function itself will take at the very end. This structure tells the compiler that our selector isn't just returning a simple value, but a memory address pointing to a specific block of executable code.
+```cpp
+return_type (*functionName(parameters_of_selector))(parameters_of_returned_function)
+```
+Let’s see how this looks in a real script. We will create a selector that chooses between different LED patterns (Slow or Fast) and returns that function to be used in our `loop`.
+```cpp
+void slowBlink(int pin) { 
+	digitalWrite(pin, HIGH); 
+	delay(1000); 
+	digitalWrite(pin, LOW); 
+	delay(1000); 
+} 
+void fastBlink(int pin) { 
+	digitalWrite(pin, HIGH); 
+	delay(200); 
+	digitalWrite(pin, LOW); 
+	delay(200); 
+} 
+void (*selectPattern(char mode))(int) { 
+	if (mode == 'S') return slowBlink; 
+	if (mode == 'F') return fastBlink; 
+	return nullptr; 
+} 
+
+void setup() { 
+	pinMode(13, OUTPUT); 
+} 
+void loop() {
+	(*currentAction)(int) = selectPattern('F');
+	if (currentAction != nullptr) { 
+		currentAction(13); 
+	}
+ }
+```
+### Using Function Pointers for a State Machine :
+One of the most powerful and practical uses of function pointers is creating a state machine. Instead of writing a massive `switch...case` or `if...else` block inside our `loop()` to check which state the system is currently in, we can simply create a global function pointer that represents the "current state."   When the system needs to change states, we just update the pointer to point to a new function.   
+To create a **function pointer**, we declare a pointer that matches the return type and parameters of the function we want to reference. The syntax may look unusual at first because the pointer name must be placed inside parentheses with the `*` symbol. This tells the compiler that the variable is a pointer to a function, not a normal function declaration.
+```cpp
+returnType (*pointerName)(parameterTypes);
+```
+Let's write a state machine for an LED that alternates between a "Blinking" state and an "Idle" state based on time.
+```cpp
+
+// 1. Declare a function pointer for the current state 
+void (*currentState)();  
+
+// 2. Define the state functions
+void stateIdle() {  
+  digitalWrite(13, LOW);  
+  Serial.println("State: IDLE. Waiting 3 seconds...");  
+  delay(3000);  
+  // Transition to the Blinking state by updating the pointer
+  currentState = stateBlinking;  
+}  
+
+void stateBlinking() {  
+  Serial.println("State: BLINKING. Blinking 3 times...");  
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(13, HIGH);  
+    delay(250);
+    digitalWrite(13, LOW);
+    delay(250);
+  }
+  // Transition back to the Idle state
+  currentState = stateIdle;  
+}  
+
+void setup() {  
+  Serial.begin(9600);  
+  pinMode(ledPin, OUTPUT);  
+  
+  // Set the initial state when the program starts
+  currentState = stateIdle;  
+}  
+  
+void loop() {  
+  // 3. Execute whatever function the pointer is currently pointing to
+  currentState();  
+}
+```
+By using the State machine approch the `loop()` function become more clean. The program flows naturally from one state to the next simply by reassigning the `currentState` pointer, keeping the logic perfectly organized and modular.
+
+### Functional Programming Concepts:
+Functional programming represent the art of solving our problems by dividing the main problem to small sets of sub problems and creating function for each one of them.  
+Functional programming cover the following 5 concepts
+
+#### Pure functions :
+These functions respect the following :
+
+- They always produce the same output for same arguments irrespective of anything else.
+- They have no side-effects i.e. they do not modify any arguments or local/global variables or input/output.
+- They have immutability. The pure function's only result is the value it returns. They are deterministic.
+
+#### Recursive function :
+Iteration in functional languages is implemented through recursion. Recursive functions repeatedly call themselves until they reache the base case.
+
+#### First-Class functions and Higher-Order function :
+First-class functions are dealt with as first-class variable. The first class variables can be passed to functions as parameter, can be returned from functions or stored in data structures. Higher order functions are the functions that take other functions as arguments and they can also return functions.
+
+#### Referential transparency :
+In functional programs variables, once defined don't change their value throughout the program.   Functional programs do not have assignment statements. If we have to store some value, we define new variables instead. This eliminates any chances of side effects because any variable can be replaced with its actual value at any point of execution. State of any variable is constant at any instant.
+
+#### Variables are Immutable :
+In functional programming, we can't modify a variable after it's been initialized. We can create new variables but we can't modify existing variables, and this really helps to maintain state throughout the runtime of a program. Once we create a variable and set its value, we can have full confidence knowing that the value of that variable will never change.
+### Headers Files :
+Functions allow us to group blocks of code into reusable units. This means we can call these functions multiple times within the same file without duplicating code. However, when other scripts need to use these functions, copying and pasting them into each script is inefficient and error-prone. To solve we use header files. 
+Header files are special files used to store function declarations and type definitions, making them accessible across multiple script files. In our previous lecture, we used some of Arduino header files to include extra libraries that provide functions and support for specific hardware modules.  like  `<LiquidCrystal.h>` , `<LiquidCrystal_I2C.h>`,  `<SoftwareSerial.h>`  and `<Wire.h>`
+
+
+#### Creating a Header File 
+In The Arduino IDE, by, click the small “...” tab in the top right corner above our sketch, then select “New Tab”. A prompt will appear asking for the file name, we can use any name but it should end with `.h`, for example, `myFunctions.h`. This will create a new header file that we can use to declare functions we want to access from our main sketch.
+
+<img src="./attachments/header.png"/>
+
+When defining a header file, there are a few lines that should always be included. First, we use include guards to prevent the header from being included multiple times, which can cause errors. This is done with `#ifndef`, `#define` at the top, and `#endif` at the bottom. Inside these guards, we write function declarations the names, return types, and parameters of the functions we plan to use and optionally define constants or macros that we want to reuse throughout our code.
+
+For example, we can create a header file called `myFunctions.h` to declare a simple LED blinking function. The header file would look like this:
+```cpp
+#ifndef MYFUNCTIONS_H   
+#define MYFUNCTIONS_H  
+  
+// Function declaration  
+void blinkLed(int pin, int delayTime);  
+  
+#endif                  // Include guard end
+```
+The actual function is defined in a separate `.cpp` file, usually with the same name as the header. Following the same steps as before, we create a new tab in Arduino IDE, give it the `.cpp` extension, and put our function definitions inside it.  
+We do this to avoid multiple definition errors. If we put full function definitions directly in the header file and include that header in multiple sketches or `.cpp` files, the compiler may see the same function defined more than once, which causes a linking error. By keeping the definitions in a single `.cpp` file, the compiler knows there is only one copy of each function, while the header simply tells other files the function exists.   
+Giving the `.cpp` file the same name as the header makes the code easier to organize and understand. The header (`.h`) provides the interface (declarations), the `.cpp` provides the implementation (definitions).
+```cpp
+#include <Arduino.h>
+#include "myFunctions.h"  
+
+void blinkLed(int pin, int delayTime) {  
+    digitalWrite(pin, HIGH);  
+    delay(delayTime);  
+    digitalWrite(pin, LOW);  
+    delay(delayTime);  
+}
+```
+Finally, in our main sketch (`sketch.ino`), we include the header file using `#include "myFunctions.h"`. This allows us to call the function anywhere in our sketch without redefining it:
+```cpp
+#include "myFunctions.h"  
+  
+const int ledPin = 13;  
+  
+void setup() {  
+    pinMode(ledPin, OUTPUT);  
+}  
+  
+void loop() {  
+    blinkLed(ledPin, 500);  
+}
+```
