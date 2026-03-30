@@ -404,6 +404,44 @@ void loop() {
     }
 }
 ```
+
+#### Working With PWM Output
+PWM allows us to simulate an analogue output by rapidly turning a digital pin on and off, varying the width of the active pulses. This is handled entirely in the background by the Arduino’s hardware timers.  
+The PWM pins are connected and controlled with the internal timer registers as following:
+
+|PWM Pin|Timer|
+|---|---|
+|D3, D11|Timer2|
+|D5, D6|Timer0|
+|D9, D10|Timer1|
+
+To set PWM output, we work with the Timer registers TCCR2A and TCCR2B in additional to OCR2B (Output Compare Register) register which set the duty cycle.
+
+First, we must configure pin D3 as an output. Since D3 is located on PORTD, we set bit 3 of the DDRD register to 1, giving us the binary value 0b00001000.   
+
+Next, we configure Timer2. In TCCR2A, setting **bit 5 (COM2B1)** to 1 configures non-inverting PWM on OC2B (pin D3). This means the output starts HIGH at the beginning of the timer cycle and goes LOW when the counter reaches the **OCR2B** value.  Then we set bits 1 and 0 (WGM21 and WGM20) to enable Fast PWM mode. In this mode, the timer counts from 0 to 255 and then automatically resets to 0, producing a continuous PWM waveform.   This gives us the binary value **0b00100011**. In **TCCR2B**, we set the timer prescaler to dictate how fast the pulses occur. Setting bit 2 to 1 sets a prescaler of 64, giving us 0b00000100.
+
+The brightness of the LED is now controlled directly by the OCR2B register. By writing a value between **0** (always off) and **255** (always on) to OCR2B, the hardware automatically adjusts the pulse width without requiring our code to manually toggle the pin on and off.
+```cpp
+void setup() {
+  DDRD = 0b00001000; 
+  
+  TCCR2A = 0b00100011; 
+  TCCR2B = 0b00000100; 
+}
+
+void loop() {
+  for (int i = 0; i <= 255; i++) {
+    OCR2B = i;
+    delay(10);
+  }
+  
+  for (int i = 255; i >= 0; i--) {
+    OCR2B = i;
+    delay(10);
+  }
+}
+```
 #### Working With Interrupts
 Another important feature of microcontrollers is the ability to use interrupts. An interrupt allows the microcontroller to immediately respond to an event without constantly checking for it inside the `loop()` function.    
 Normally, a program runs instructions sequentially. However, when an interrupt event occurs, the microcontroller temporarily pauses the current program, executes a special function called an Interrupt Service Routine (ISR), and then returns to the main program.  
