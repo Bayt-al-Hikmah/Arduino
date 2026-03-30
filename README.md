@@ -22,7 +22,6 @@ The course is divided into 5 lectures, progressing from basic electrical concept
   - [Lecture 4 — Displays & Communication](#lecture-4--displays-communication-protocols--wireless)
   - [Lecture 5 — Low-Level Programming](#lecture-5--atmega328p-low-level-programming--register-configuration)
 - [Prerequisites](#-prerequisites)
-- [Folder Structure](#-folder-structure)
 - [Learning Path](#-learning-path)
 
 
