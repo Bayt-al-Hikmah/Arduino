@@ -249,6 +249,45 @@ Since we want to check only the fourth bit corresponding to pin D3, we perform a
 
 If the PIND register contains a value of the form **xxxx1xxx**, the result of the operation will be **00001000**, indicating that the button is pressed. Otherwise, if the bit is 0, the result will be **00000000**, indicating that the button is not pressed.
 
+#### Working With Analog Input
+Let us move on to analogue inputs. Unlike digital pins that only read HIGH or LOW states, analogue pins can measure varying voltage levels. The Arduino uses a built-in Analog-to-Digital Converter (ADC) to translate these voltages into numbers ranging from **0** to **1023**.
+
+This process is controlled directly by specific ADC registers, primarily the **ADMUX** (ADC Multiplexer Selection Register) and the **ADCSRA** (ADC Control and Status Register A).
+
+To demonstrate analog input using register manipulation, we will rebuild automated plant-watering system. The output voltage of a resistance-based soil moisture sensor changes depending on the soil moisture level:
+- When the soil is **very wet**, the sensor outputs a **lower voltage**.
+- When the soil becomes **drier**, the sensor outputs a **higher voltage**.
+
+
+<img src="../Lecture 3/attachments/pump_circuit.png" />
+
+To read the analogue value, we first configure the **ADMUX** register. This register determines the reference voltage and selects which analogue pin to read from. Setting bit 6 to **1** selects the standard 5V reference. The lowest four bits select the channel; for pin **A0**, we leave them as **0000**. Therefore, the ADMUX register is set to **0b01000000**.
+
+Next, we configure the **ADCSRA** register to enable the ADC hardware and set its clock speed. Setting bit 7 to **1** enables the ADC. Setting the lowest three bits to **1** gives a division factor of 128, which provides the correct clock speed for accurate readings. This makes our ADCSRA value **0b10000111**.
+
+To start an analogue reading, we use the bitwise OR operator (`|`) to set bit 6 of the ADCSRA register to **1** without changing the other bits. We then use a `while` loop to continuously check this same bit. The hardware will automatically clear it to **0** the moment the conversion is complete. The resulting 10-bit value is then stored in the **ADC** register.
+```cpp
+void setup() {
+  ADMUX = 0b01000000;  
+  ADCSRA = 0b10000111;
+  DDRB = 0b000001; 
+}
+
+void loop() {
+  ADCSRA = ADCSRA | 0b01000000; 
+  while (ADCSRA & 0b01000000) {
+    
+  }
+  if (ADC > 600){
+	   PORTB = 0b00001;
+  }else{
+	  PORTB = 0b00000;
+  }
+}
+```
+
+
+
 #### Bitwise Operators
 When working with microcontroller registers, data is manipulated bit by bit, since each bit typically controls or represents the state of a specific hardware feature or pin. Standard arithmetic and comparison operators are not suitable for this type of operation because they work on entire numerical values rather than on individual bits.   
 For this reason, programming languages such as C and C++ provide a special category of operators known as bitwise operators. These operators allow us to directly manipulate individual bits within a variable.     
