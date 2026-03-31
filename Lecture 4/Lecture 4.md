@@ -101,6 +101,7 @@ Each matrix has its own device address:
 |Second matrix|1|
 |Third matrix|2|
 |Fourth matrix|3|
+
 Inside the `setup()` function we must initialize each device separately, just like we did for the first one.
 ```cpp
 void setup() {  
@@ -216,6 +217,7 @@ display.setSegments(data);
 | 0x06      | 1           |
 | 0x5B      | 2           |
 | 0x4F      | 3           |
+
 So this array represents the digits:
 ```
 0 1 2 3
@@ -431,6 +433,7 @@ Once the data bits have been transmitted, an optional parity bit may be added fo
 Finally, the frame ends with one or more stop bits, which are HIGH signals. The stop bit marks the end of the data frame and returns the line to the idle HIGH state, allowing the receiver to recognize that the transmission has finished before waiting for the next start bit. 
 
 <img src="./attachments/uart_principle.png" />
+
 #### Arduino UART Configuration
 The Arduino Uno contains a single hardware UART module. This UART is connected to the following pins:
 - **Pin 1 TX (Transmit)**
@@ -547,6 +550,7 @@ Unlike UART, where each connection requires a separate pair of wires, all I2C de
 In an I2C system, devices are organized using a master–slave architecture:
 - The master device controls the communication and generates the clock signal on the SCL line.
 - The slave devices respond to the master when they are addressed.
+
 <img src="./attachments/i2c_bus.png" />
 
 Each slave device connected to the I2C bus has a unique address. When the master wants to communicate with a specific device, it sends the address of that device on the SDA line. Only the device with the matching address will respond, while the others remain inactive.
@@ -585,6 +589,7 @@ On the master Arduino, we add two push buttons to send commands to the slaves:
 When a button is pressed, the master Arduino sends a command through the I2C bus to the corresponding slave device. The slave receives the command and toggles the state of its LED. At the same time, the LCD display connected to the master Arduino is updated to show the current state of each slave’s LED.
 
 <img src="./attachments/i2c_circuit.png" />
+
 Now let's create the program for the master Arduino.   
 First, we include the Wire library, which allows the Arduino to communicate using the I2C protocol, and the LiquidCrystal_I2C library, which allows us to control the LCD display through the I2C bus.  
 Inside the `setup()` function, we initialize the I2C communication using `Wire.begin()`, configure the button pins as inputs, and initialize the LCD display. The LCD is then used to display the current state of each slave’s LED.
