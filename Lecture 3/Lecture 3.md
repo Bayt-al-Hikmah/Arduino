@@ -390,8 +390,12 @@ The output voltage is taken from the point between the two resistors, and its va
 <img src="./attachments/Voltage_divisor.png" />
 
 The voltage divider equation is:
-$$V_1 =V_{in}\times \frac{R_1}{R_1+R_2}$$
-$$V_2 =V_{in}\times \frac{R_2}{R_1+R_2}$$
+```math
+V_1 =V_{in}\times \frac{R_1}{R_1+R_2}
+```
+```math
+V_2 =V_{in}\times \frac{R_2}{R_1+R_2}
+```
 Let’s build a project to create an automatic night light that turns on an LED when it gets dark. For this project, we will need an LDR, a 10k Ω resistor, an LED, and a 220 Ω resistor.
 First, connect one leg of the LDR to 5V on the Arduino. Then, connect the other leg of the LDR to both the analog pin A0 and to one end of the 10k Ω resistor. Finally, connect the other end of the 10k Ω resistor to GND.
 
