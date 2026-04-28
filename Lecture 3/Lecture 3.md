@@ -275,7 +275,7 @@ When we look closely at the digital pins on an Arduino board, we can notice that
 **Pulse Width Modulation (PWM)** is a technique used to simulate an analog output using a digital signal. Since Arduino digital pins can only output **HIGH (5V)** or **LOW (0V)**.   
 The principle of **Pulse Width Modulation (PWM)** is based on switching the output signal ON and OFF repeatedly during a constant time period T.
 
-This fixed period TTT is called the PWM period, and within this period, the signal stays ON for a certain amount of time and OFF for the rest of the time, the percentage of time that the signal remains ON during one period is called the duty cycle.   
+This fixed period T is called the PWM period, and within this period, the signal stays ON for a certain amount of time and OFF for the rest of the time, the percentage of time that the signal remains ON during one period is called the duty cycle.   
 The output voltage is determined by the **average value** of the signal over one complete period.
 For example (assuming a 5V system):
 - If the output stays ON for the entire period (100% duty cycle),  the average voltage will be **5V**.
@@ -296,12 +296,14 @@ After setting the pin as an output, we use the `analogWrite()` function to gener
 If we write `255`, the duty cycle is 100%, meaning the signal stays ON all the time. If we write `0`, the duty cycle is 0%, meaning the signal is always OFF. For a 50% duty cycle, we use approximately `127`, which keeps the signal ON for half of the period.
 
 Using this, we can calculate the duty cycle with the following equation:
+```math
+Duty\ Cycle (\%) = \frac{value}{255} \times 100
+```
+By adjusting this value, we directly control the duty cycle, which controls the average voltage applied to the connected device.  
 
-$$Duty\ Cycle (\%) = \frac{value}{255} \times 100 $$
-
-By adjusting this value, we directly control the duty cycle, which controls the average voltage applied to the connected device.
-$$V_{average}​=\frac{value}{255}​×V_{max}​$$
-
+```math
+V_{average}​=\frac{value}{255}​×V_{max}​
+```
 <img src="./attachments/PWM.png" />
 
 ### Analogue GPIO Pins
