@@ -284,7 +284,7 @@ For example (assuming a 5V system):
     
 - If the output stays ON for half of the period (50% duty cycle), the average voltage will be **2.5V**.
 
-$$ V_{average}​=\frac{T_{on}}{T_{Off}}   \times V_{max}​ = DutyCycle \times V_{max}​ $$
+$$ V_{average}​=\frac{T_{on}}{T}   \times V_{max}​ = DutyCycle \times V_{max}​ $$
 
 To work with PWM in Arduino, we first configure the desired pin as an output inside the `setup()` function:
 ```
