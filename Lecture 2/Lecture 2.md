@@ -100,14 +100,14 @@ The Arduino Uno includes several power pins, such as 5V, 3.3V, and GND (ground).
 #### Reset Button
 The reset button restarts the Arduino program from the beginning. This is useful for testing and debugging our projects.
 #### Crystal Oscillator
-FinallytThe crystal oscillator helps the microcontroller keep accurate timing. It ensures that the Arduino executes instructions at the correct speed.
+FinallytThe crystal oscillator helps the microcontroller keep accurate timing. It ensures that the Arduino executes instructions at the correct speed. 
+## Arduino Programming
 ### Arduino IDE
 To communicate with our Arduino board and upload programs to it, we need the **Arduino IDE** (Integrated Development Environment).     
 The Arduino IDE is the official software used to write, compile, and upload code to Arduino boards. It provides a simple and user-friendly environment that is suitable for beginners as well as advanced users. We can download it from the official Arduino website: [https://support.arduino.cc/hc/en-us/articles/360019833020-Download-and-install-Arduino-IDE](https://support.arduino.cc/hc/en-us/articles/360019833020-Download-and-install-Arduino-IDE).    
-The Arduino IDE also includes many ready-to-use example sketches that help beginners learn how to use different electronic components and understand programming concepts. In addition, the IDE allows us to install libraries, which are collections of prewritten code that make it easier to control electronic components without writing complex programs from scratch. These libraries support many devices such as LCD screens, temperature sensors, Bluetooth and Wi-Fi modules, and servo motors, making project development faster and more efficient.   
-## Arduino Programming
+The Arduino IDE also includes many ready-to-use example sketches that help beginners learn how to use different electronic components and understand programming concepts. In addition, the IDE allows us to install libraries, which are collections of prewritten code that make it easier to control electronic components without writing complex programs from scratch. These libraries support many devices such as LCD screens, temperature sensors, Bluetooth and Wi-Fi modules, and servo motors, making project development faster and more efficient.  
 ### Sketch
-In Arduino programming, a sketch is the name given to a complete program written for an Arduino board. It is the main file that contains all the instructions and logic needed to control the hardware. A sketch is usually written using a simplified version of the C++ programming language and saved with the `.ino` extension.
+Sketch is the name given to a complete program written for an Arduino board. It is the main file that contains all the instructions and logic needed to control the hardware. A sketch is usually written using a simplified version of the C++ programming language and saved with the `.ino` extension.   
 
 A sketch can include variables, functions, and libraries, and it is uploaded to the microcontroller to run continuously. Each sketch must contain two essential functions: **setup()** and **loop()**, which define how the program starts and behaves during execution.
 #### Setup
@@ -122,8 +122,10 @@ Typical tasks in loop():
 - Reading sensors.
 - Controlling motors or LEDs.
 - Making decisions and repeating actions.
+
+### C Programing Basic Concepts
 ### Variables and Data Types
-Variables in Arduino can be thought of as containers or boxes used to store information that your program can use and manipulate. Each variable has a data type that tells the compiler what kind of data it will hold, such as numbers, text, or logical states.
+Variables can be thought of as containers or boxes used to store information that our program can use and manipulate. Each variable has a type that tells the compiler what kind of data it will hold, such as numbers, text, or logical states.
 
 To create variable we start with declaring the data type of the variable then the variable name then if it have value we assign value to it using `=` operator
 ```
@@ -135,14 +137,11 @@ Represents a **single character**, such as `'a'`, `'!'`, or `'$'`.
 - Uses **1 byte** of memory.
 - Stored using **ASCII encoding**.
 - Arithmetic operations on `char` actually operate on their ASCII values.
-
-Example:
 ```
 char letter = 'A';  // ASCII value 65
 ```
 #### ``String``
 Represents a sequence of characters (text) like "Hello" or "Arduino".   
-Example:
 ```
 String message = "Hello Arduino";
 ```
@@ -150,8 +149,6 @@ String message = "Hello Arduino";
 Represents **integer numbers** (whole numbers without decimals), such as `5`, `-10`, or `0`.
 - Typically 2 bytes on Arduino Uno.
 - Arithmetic operations on integers return integer values (e.g., `4 / 3` gives `1`).
-
-Example:
 ```
 int count = 10;
 ```
@@ -160,8 +157,7 @@ Numbers can be written in different numeral systems, not only decimal.
 - Binary (base 2) prefixed with ``0b``.
 - Octal (base 8) prefixed with ``0``.
 - Hexadecimal (base 16) prefixed with ``0x``.
-
-```
+```c
 int count = 10;      // decimal
 int bin   = 0b1010;  // binary (10 in decimal)
 int oct   = 012;     // octal (10 in decimal)
@@ -171,39 +167,31 @@ int hex   = 0xA;     // hexadecimal (10 in decimal)
 Used for larger integer numbers than `int`.
 - Typically 4 bytes on Arduino boards.
 - Useful when you need to count large numbers or work with long durations.
-
-Example:
-```
+```c
 long milliseconds = 100000L;
 ```
 #### `float`
 Represents decimal numbers with single-precision.
 - Typically 4 bytes.
 - Used for values like `3.14` or `-2.5`.
-
-Example:
-```
+```c
 float pi = 3.14;
 ```
 #### `double`
 Represents decimal numbers with higher precision.
 - On many Arduino boards (Uno, Nano), `double` is the same as `float` (4 bytes).
 - On boards like Arduino Due, `double` uses 8 bytes for more precise calculations.
-
-Example:
-```
+```c
 double precisePi = 3.1415926535;
 ```
 #### `bool`
 Represents a **logical value**, either **true** or **false**. Internally stored as `1` (true) or `0` (false).  
-Example:
-```
+```C
 bool isLEDOn = true;
 ```
 #### `void`
 Represents no value. used for functions that do not return anything.   
-Example:
-```
+```C
 void blinkLED() {  
   // This function does not return a value  
 }
@@ -218,8 +206,6 @@ Besides int and long, Arduino supports smaller or specialized integer types.
 Arrays are **collections of variables** of the same type stored together.  
 - Elements are accessed using **indices**, starting from `0`.
 - Arrays can hold integers, characters, or other data types.
-
-Examples:
 ```
 int numbers[] = {4, 5, 7};           // int array  
 char message[] = "hello";            // char array (string)  
@@ -259,18 +245,16 @@ There are two ways to define constants:
 - Using `#define` directive ``#define PI 3.14159``
 
 `#define` is a preprocessor directive that replaces the name with a value before compilation and has no type checking, while `const` creates a typed variable whose value cannot change, allowing the compiler to enforce type safety.   
-
 ### Arithmetic Operators
-Arithmetic operators are used to perform mathematical operations in Arduino programs. They allow calculations such as addition, subtraction, multiplication, and division.
+Arithmetic operators are used to perform mathematical operations. They allow calculations such as addition, subtraction, multiplication, and division.
 - **Addition (+):** Adds two operands. When used with char types, it adds their ASCII values and returns the resulting character.
 - **Subtraction (-):** Subtracts the second operand from the first. Similar to addition, it operates on ASCII values when used with char types.
 - **Multiplication (*):** Multiplies two operands. This operator cannot be directly used with char types.
 - **Division (/):**
-    
     - For float or double types, it performs regular division and returns the exact result.
-    
     - For int or long types, it performs integer division, which discards any fractional part of the result. It does not round the result.
 - **Modulo (%):** Returns the remainder of the division between two operands. It is only applicable for int and long types.
+
 ### Compound Operators
 Compound operators combine an arithmetic operation with assignment in a single step. They make the code shorter, clearer, and easier to read.
 **`+=` (Compound addition):**  Adds a value to a variable and assigns the result back to the same variable.  `a += 5;` same as ``x = x + 5;``  
@@ -280,14 +264,13 @@ Compound operators combine an arithmetic operation with assignment in a single s
 **`%=` (Compound remainder):**  Stores the remainder of division.  ``x %= 3;``   same as ``x = x % 3;``  
 #### Increment and Decrement Operators
 These operators are special compound operators used to increase or decrease a variable by 1. They are very common in Arduino loops and counters.
-
 **`++` (Increment):**  Increases a variable by one.  ``i++;``   same as ``i = i + 1;``    
 **`--` (Decrement):**  Decreases a variable by one.  ``i--;``  same as ``i = i - 1;``
 
 These operators can be used in two forms:
-
 - **`++i` (pre-increment)**: increment first, then use the value.
 - **`i++` (post-increment)**: use the value first, then increment.
+
 ### Comparison Operators
 Comparison operators are used to compare two values and produce a boolean result (true or false).
 
@@ -301,7 +284,7 @@ Comparison operators are used to compare two values and produce a boolean result
 | <=       | Less or equal    |
 
 ### Boolean Operators
-Boolean operator help us to  combine multiple conditions into more complex expressions. The result of a logical operation is also a boolean value (true or false).
+Boolean operator help us to  combine multiple conditions into more complex expressions.
 
 - **|| (OR):** Returns **true** if at least one of the conditions connected by `||` is true.
 - **&& (AND):**  Returns **true** only if all the conditions connected by `&&` are true.
@@ -313,9 +296,10 @@ Boolean operator help us to  combine multiple conditions into more complex expr
 | true  | false | false  | true     | false |
 | false | true  | false  | true     | true  |
 | false | false | false  | false    | true  |
+
 ### Conditional Statements
 #### Single Condition with `if`
-In Arduino, we often want some code to run only when a condition is true. If the condition is false, the Arduino simply skips that block and continues running the rest of the program.
+When we make our project, we often want some code to run only when a condition is true. If the condition is false, We simply skips that block and continues running the rest of the program.
 
 ```
 if (condition){
@@ -348,8 +332,7 @@ Arduino also supports the ternary operator `? :`. It is useful for short and sim
 status = condition ? "value if true" : "value if false";
 ```
 #### The `switch` Statement
-When checking a value against many options, Arduino provides the `switch` statement. It makes the code cleaner compared to many `else if` conditions.
-#### Switch Case statement :
+When checking a value against many options, We can use the `switch` statement. It makes the code cleaner compared to many `else if` conditions.
 ```
 switch (variable){
 	case value1:
@@ -372,7 +355,7 @@ switch (variable){
 ### Loops
 Loops help us to repeat an action multiple times. there is three type of loops
 #### The `for` Loop
-A `for` loop is used when we know how many times we want to repeat a block of code. It is very common in Arduino, especially for controlling LEDs, sensors, or repeating tasks a fixed number of times.
+A `for` loop is used when we know how many times we want to repeat a block of code. It is very common in Arduino projects, especially for controlling LEDs, sensors, or repeating tasks a fixed number of times.
 ```
 for (initialization;condition; increment/decrement){
 	instructions we want to repeat
@@ -387,7 +370,7 @@ instructions we want to repeat
 
 ```
 #### The `do-while` Loop
-A `do-while` loop is similar to `while`, but it always runs **at least once**, even if the condition is false.
+A `do-while` loop is similar to `while`, but it always runs at least once, even if the condition is false.
 ```
 do{
 	instructions we want to repeat
@@ -440,9 +423,9 @@ Now we verify the program by clicking the Verify button to check for any errors 
 
 We will notice that our LED turns on and stays on. This means we have done only half of the work. Now, we need to make it stay on for a short period and then turn off for a short period. By repeating this process, we will make it blink.   
 To do this, we use the `delay()` function, which pauses (or freezes) the program for a specific number of milliseconds.  
+
 First, we turn the LED on. Then we use `delay()` to keep it on for a short time. After that, we turn the LED off and use `delay()` again to keep it off for a short time. By repeating these steps inside the `loop()` function, the LED will continuously blink.
 ```cpp 
-
 void loop() {
   digitalWrite(13, HIGH);
   delay(500);
@@ -452,11 +435,11 @@ void loop() {
 ```
 
 ### LED Control Using a Push Button
-Let’s make our project more interactive by adding a **push button**. In this project, when we press the button, the LED will turn on and stay on. When we press the button again, the LED will turn off. 
+Let’s make our project more interactive by adding a push button. when we press the button, the LED will turn on and stay on. When we press the button again, the LED will turn off. 
 This means the button will act like a switch, allowing us to control the LED manually instead of making it blink automatically.    
-Before wiring and building the circuit, let’s explore another important component that will help us when prototyping and working on Arduino projects: the **breadboard**.
+Before wiring and building the circuit, let’s explore another important component that will help us when prototyping and working on Arduino projects: the breadboard.
 #### Breadboard
-A breadboard is a tool that allows us to build and test electronic circuits **without soldering**. It makes prototyping fast and easy because we can quickly add, remove, or change components and connections.  
+A breadboard is a tool that allows us to build and test electronic circuits without soldering. It makes prototyping fast and easy because we can quickly add, remove, or change components and connections.  
 Inside the breadboard, the holes are connected in specific patterns:
 - **Power rails (side columns):**  The long rows on the sides of the breadboard are used to distribute power. All the holes in each row are connected together. Usually, one side is used for **VCC (positive)** and the other for **GND (ground)**. This allows us to easily provide power to multiple components.
 - **Terminal strips (middle area):**  In the center of the breadboard, the holes are connected in small horizontal groups, typically in rows of five. Each group of five holes is connected internally. This means if you place a wire or component leg in one hole, it is electrically connected to the other four holes in the same row.
@@ -465,34 +448,26 @@ Inside the breadboard, the holes are connected in specific patterns:
 <img src="./attachments/Beardboard.png" />
 
 #### Push Button
-A push button is a simple input component that allows us to control a circuit by pressing it. When the button is **not pressed**, the internal contacts are open, so no current flows. When we press the button, the contacts close and allow current to pass through.
+A push button is a simple input component that allows us to control a circuit by pressing it. When the button is not pressed, the internal contacts are open, so no current flows. When we press the button, the contacts close and allow current to pass through.
 
-Inside the push button, the pins that are facing each other are internally connected. This means the two pins on one side are connected together, and the two pins on the opposite side are also connected. When the button is pressed, both sides become connected.
+Inside the push button, the pins are connected as following:
 
 <img src="./attachments/push_button.png" />
 
 #### Wiring
-For this project, we will need 1 LED, 1 push button and 2 resistors (220Ω), First, connect the **GND** and **5V (VCC)** pins from the Arduino board to the **power rails** of the breadboard. This allows us to easily access power and ground anywhere on the board.  
-Next, place the LED on the breadboard:
-- Connect the **short leg (cathode)** of the LED to the **GND rail** on the breadboard.
-- Connect the **long leg (anode)** of the LED to one end of a resistor.
-- Connect the other end of that resistor to **digital pin 13** on the Arduino.
+Lets start making our prokect by building the circuit, we will need 1 LED, 1 push button and 2 resistors (220Ω), First, connect the GND and 5V (VCC) pins from the Arduino board to the power rails of the breadboard. This allows us to easily access power and ground anywhere on the board.    
+Next, we connect the short leg (cathode) of the LED to the GND rail on the breadboard, and the long leg (anode) of the LED to one end of a resistor. and the other end of that resistor to digital pin 13 on the Arduino.
 
-Now, place the push button on the breadboard .
-- Connect one side of the push button to **5V**.
-- Connect the other side to a second resistor.
-- Connect the other end of this resistor to one of the Arduino’s digital input pins (pin 2).
-- Also connect that same point to **GND** through the resistor (this acts as a pull-down resistor).
+After that, we place the push button on the breadboard, we connect one side of the push button to 5V, the other side to one end of the second resistor, the other end of this resistor to one of the Arduino’s digital input pins (pin 2), and aAlso connect that same point to GND (this acts as a pull-down resistor).
 
+We use a pull-down resistor to make sure the Arduino reads a stable and correct signal from the push button. Without pull-down resistor before clicking the button the input pin of the Arduino is not connected to anything, so it becomes floating and that make it randomly read HIGH or LOW because of electrical noise.
 
-
-We use a pull-down resistor to make sure the Arduino reads a stable and correct signal from the push button. When the button is not pressed, the input pin of the Arduino is not connected to anything, so it becomes floating. A floating pin can randomly read HIGH or LOW because of electrical noise, which can cause the LED to behave unpredictably.   
-The pull-down resistor connects the input pin to **GND** when the button is not pressed, forcing it to read LOW in a stable way. When the button is pressed, the pin connects to **5V** and reads HIGH. This makes the button work reliably and also protects the circuit from unwanted current.
+The pull-down resistor connects the input pin to GND when the button is not pressed, forcing it to read LOW in a stable way. When the button is pressed, the pin connects to **5V** and reads HIGH. 
 
 <img src="./attachments/circuit.png" />
 
 #### Creating The Program
-First, we connect the Arduino to our computer using a USB cable. and set the Arduino IDE so we can upload the program.  
+We connect the Arduino to our computer using a USB cable. and set the Arduino IDE so we can upload the program.  
 We using pin 13 as an output pin for the LED, and pin 2 as an input pin for the push button. In the `setup()` function, we configure these pins using `pinMode()`. 
 ```cpp
 void setup() {  
