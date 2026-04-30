@@ -14,13 +14,15 @@ Each digital pin can be configured as either an input or an output, depending on
 
 #### Digital GPIO Functions
 The Arduino provides several functions that allow us to control and use digital pins easily.   
-**`pinMode()`:** This function is used to configure the mode of a digital pin. It allows us to set the pin as either an input or an output.  
+**1. `pinMode()`:**   
+This function is used to configure the mode of a digital pin. It allows us to set the pin as either an input or an output.  
 It accepts two arguments:
 - The pin number
 - The **mode** we want to set (`INPUT`, `OUTPUT`, or `INPUT_PULLUP`)
 
-`INPUT_PULLUP` mode to enable the Arduino’s internal pull-up resistor. It helps avoid unstable readings when using input devices like push buttons, it force the `HIGH` state when no signal is sent to the pin.   
-**`digitalWrite()`:** This function is used to send a digital signal to a pin. It allows us to set the pin to HIGH or LOW.     
+`INPUT_PULLUP` mode enable the Arduino’s internal pull-up resistor. It helps avoid unstable readings when using input devices like push buttons, it force the `HIGH` state when no signal is sent to the pin.   
+**2. `digitalWrite()`:**   
+This function is used to send a digital signal to a pin. It allows us to set the pin to HIGH or LOW.     
 It accepts two arguments:
 - The pin number
 - The signal state (`HIGH` or `LOW`)
@@ -29,8 +31,10 @@ It accepts two arguments:
 This function is used to read the state of a digital pin. It returns either HIGH or LOW depending on the input signal.    
 It accepts one argument:
 - The pin number
+### Digital Output and Input Devices
+Now we know the basic functions to deal with the Digital GPIO pins lets explore some of common and most used digital sensor and devices
 #### Leds and Push Buttons
-In our previous lecture, we explored LDs and push buttons, which are among the most commonly used digital components.   
+In our previous lecture, we explored LEDs and push buttons, which are among the most commonly used digital components.    
 LEDs are used as output devices. They have two states: ON and OFF. We can turn an LED ON by sending a HIGH signal from a digital pin, and turn it OFF by sending a LOW signal. LEDs are often used as indicators to show the status of a system.   
 Push buttons are used as input devices. They also have two states: pressed and released. When a button is pressed, it sends a signal (HIGH or LOW, depending on the circuit design) to the Arduino. The Arduino reads this signal and performs an action based on the button state.
 #### Buzzers
@@ -42,7 +46,7 @@ There are two main types of buzzers:
 Let’s build a simple project where an LED blink and buzzer produces sound, when a push button is pressed.     
 We start by making the circuit, we can use the circuit of the previous lecture, we just add the active buzzer we connect it to pin 2. 
 
-<img src="./attachments/buzzer_circuit.png" />
+<img src="./attachments/buzzer_circuit.png" height="300px"/>
 
 Now, let’s create our program.  
 First, we start with the **`setup()`** function. Here, we configure the pins:
@@ -55,39 +59,42 @@ void setup() {
   pinMode(2, INPUT);
 }
 ```
-Next, we write the code for the **`loop()`** function. Our goal is to make the LED blink and the buzzer make sound when the push button is pressed.  
-To do this, we use an  `while` loop to check the state of the button. While the button is pressed (On HIGH state):
+Next, we write the code for the **`loop()`** function. Our goal is to make the LED blink and the buzzer make sound when the push button is pressed, to do this, we use an  `if` to check the state of the button. if the button is pressed (On HIGH state):
 1. Send a HIGH signal to the buzzer to produce sound.
 2. Send a HIGH signal to the LED pin to turn it on.
 3. Wait 500 ms using the `delay()` function.
 4. Turn the LED OFF  by sending a LOW signal.
 5. Wait 500 ms before repeating.
 
-Outside the while loop, we ensure both the LED and buzzer are turned off by sending LOW signals to their pins. This guarantees that nothing remains active when the button is not pressed.
-
+If the button isn't pressed, we turn both the LED and buzzer off by sending LOW signals to their pins. 
 ```cpp
 void loop() {
-  while(digitalRead(2)) {
+  if(digitalRead(2)) {
     digitalWrite(8,HIGH);
     digitalWrite(13,HIGH);
     delay(500);
     
     digitalWrite(13,LOW);
     delay(500);
+  }else{
+    digitalWrite(8,LOW);
+    digitalWrite(13,LOW);
   }
-  digitalWrite(8,LOW);
-  digitalWrite(13,LOW);
 }
 ```
 #### Ultrasonic sensor
-Ultrasonic sensors are one of the most useful sensors used with Arduino. They help us measure distance by using sound waves. When we want to calculate the depth of a well, or how long a cave is, we often rely on sound. For example, in the past, people would throw a rock into a well and listen for the sound when it hit the ground. By measuring the time it took for the sound to return, they could estimate how deep the well was.  
+Ultrasonic sensors help us to measure distance by using sound waves. When we want to calculate the depth of a well, or how long a cave is, we often rely on sound. For example, in the past, people would throw a rock into a well and listen for the sound when it hit the ground. By measuring the time it took for the sound to return, they could estimate how deep the well was.  
 The same idea applies when exploring a cave. An adventurer might shout and listen for the echo. The time it takes for the echo to come back gives an idea of how far away the cave walls are.   
 
 In a similar way, an ultrasonic sensor such as the HC-SR04 Ultrasonic Sensor sends out high-frequency sound waves and measures how long it takes for the echo to return. Using this time, the Arduino calculates the distance to an object.
 
-<img src="./attachments/ultrasonic.png"/>
+<img src="./attachments/ultrasonic.png" height="200px"/>
 
-Let’s create a project where we use **three LEDs** to indicate distance:
+The HC-SR04 ultrasonic sensor has four pins: VCC and GND are used to power the sensor. The TRIG pin is used to send a short HIGH pulse (about 10 microseconds), which makes the sensor emit an ultrasonic sound wave. The ECHO pin then goes HIGH and stays HIGH until the reflected sound wave returns to the sensor. The duration of this HIGH signal represents the time taken for the sound to travel to an object and back.
+
+Using this, we can calculate the distance by multiplying the duration by the speed of sound, then dividing by two. We divide by two because the measured duration represents the time it takes for the sound wave to travel to the object and back, which is twice the actual distance.
+
+Let’s create a project where we use three LEDs to indicate distance:
 - The red LED turns on when the object is 60 cm or more away.
 - The yellow LED turns on when the object is at least 30 cm away.
 - The green LED turns on when the object is closer than 30 cm.
@@ -103,11 +110,11 @@ The HC-SR04 Ultrasonic Sensor has four pins:
 3. Trig (Trigger) → Used to send the ultrasonic pulse, we connect it to Pin 8
 4. Echo → Used to receive the reflected signal, we connect it to Pin 7
 
-<img src="./attachments/ultrasomic_circuit.png" />
+<img src="./attachments/ultrasomic_circuit.png" height="400px"/>
 
 After finishing the circuit, it is time to write the program.
 
-We start with the **`setup()`** function. In this function, we configure the pins as follows:
+We start with the*`setup()` function. In this function, we configure the pins as follows:
 - Pins 13, 12, 11 and 8 are set as output pins 
 - Pin 7 is set as an input pin.
 ```cpp
@@ -119,24 +126,22 @@ void setup(){
   pinMode(8,INPUT);
 }
 ```
-After the ``setup`` function we create two float variables
+After the ``setup`` function we create two float variables, duration variable stores how long the sound wave travels, and the distance variable stores how far the object is from the sensor.
 ```
 float duration, distance;
 ```
-The duration variable stores how long the sound wave travels, and the distance variable stores how far the object is from the sensor.
+Finally, inside the `loop()` function, we begin the measurement process. First, we set the Trig pin to LOW for a short time to make sure it starts in a stable state. Then we send a short HIGH pulse to the Trig pin for 10 microseconds. This pulse makes the sensor send an ultrasonic sound wave.
 
-Finally, inside the **`loop()`** function, we begin the measurement process. First, we set the Trig pin to **LOW** for a short time to make sure it starts in a stable state. Then we send a short HIGH pulse to the Trig pin for 10 microseconds. This pulse makes the sensor send an ultrasonic sound wave.
+The sound wave travels through the air, hits an object, and then reflects back to the sensor. While the sound wave is traveling, the sensor sets the Echo pin to HIGH. The Echo pin remains HIGH until the reflected wave returns to the sensor. Once the wave is received, the Echo pin goes back to LOW.
 
-The sound wave travels through the air, hits an object, and then reflects back to the sensor. While the sound wave is traveling, the sensor sets the **Echo pin to HIGH**. The Echo pin remains HIGH until the reflected wave returns to the sensor. Once the wave is received, the Echo pin goes back to LOW.
-
-To measure how long the sound wave took to travel to the object and back, we use the **`pulseIn()`** function. This function takes two arguments:
+To measure how long the sound wave took to travel to the object and back, we use the `pulseIn()` function. This function takes two arguments:
 - The pin number (in our case, the Echo pin)
 - The state we want to measure (`HIGH` or `LOW`)
+
 Since we want to measure how long the Echo pin stays HIGH, we use `HIGH` as the second argument. The function then returns the time in microseconds.
 
 We know that speed is equal to distance divided by time. In this project, we assume that the speed of sound is constant, which is approximately 0.0343 cm per microsecond.
-Using this information, we can calculate the distance by multiplying the measured time by the speed of sound. However, the measured time represents the total travel time of the sound wave, which includes both the trip from the sensor to the object and the return trip back to the sensor.  
-Therefore, after calculating the distance, we divide the result by **2** to obtain the actual distance between the sensor and the object. This gives us how far the object is from the sensor.
+Using this information, we can calculate the distance by multiplying the measured time by the speed of sound. However, the measured time represents the total travel time of the sound wave, which includes both the trip from the sensor to the object and the return trip back to the sensor.Therefore, after calculating the distance, we divide the result by 2 to obtain the actual distance between the sensor and the object. This gives us how far the object is from the sensor.
 
 With this distance value, we can then control the LEDs based on how close or far the object is.
 ```cpp
@@ -187,21 +192,19 @@ void loop(){
 }
 ```
 #### Obstacle Sensor
-Another important sensor is the **obstacle sensor**. It allows us to detect the presence of obstacles using **infrared (IR) signals**. The sensor has an LED that emits infrared light and a receiver that detects the reflected IR signals. When an object is in front of the sensor, the infrared light reflects back to the receiver, allowing the sensor to detect the obstacle.   
-The sensor also includes an internal variable resistor (potentiometer) that allows us to adjust the detection distance. The obstacle sensor has three pins: **VCC**, **GND**, and **OUT** (output). The output pin becomes **LOW** when an obstacle is detected and **HIGH** when no obstacle is present.
+The obstacle sensor allows us to detect the presence of obstacles using infrared (IR) signals. The sensor has an LED that emits infrared light and a receiver that detects the reflected IR signals. When an object is in front of the sensor, the infrared light reflects back to the receiver, allowing the sensor to detect the obstacle.   
+The sensor also includes an internal variable resistor (potentiometer) that allows us to adjust the detection distance, When the potentiometer is turned clockwise, the detection distance becomes larger, making the sensor more sensitive. When it is turned counterclockwise, the detection distance becomes shorter, making the sensor less sensitive
 
-We use the **built-in potentiometer** to adjust the detection distance of the obstacle sensor.  
-When the potentiometer is turned **clockwise**, the detection distance becomes **larger**, making the sensor more sensitive. When it is turned counterclockwise, the detection distance becomes **shorter**, making the sensor less sensitive
+The obstacle sensor has three pins: VCC, GND, and OUT (output). The output pin becomes LOW when an obstacle is detected and HIGH when no obstacle is present.
 
-<img src="./attachments/Obstacle_sensor.png"/>
+<img src="./attachments/Obstacle_sensor.png" width="450px"/>
 
 Some obstacle sensor modules include an additional pin for analog output (AO). This pin provides a voltage that changes depending on the distance of the obstacle. As the obstacle gets closer, the output voltage decreases, and as the obstacle moves farther away, the output voltage increases.
 #### Relays
-The Arduino digital pins provide an output voltage of 5V or 3.3V, depending on the board and its power supply. These pins can supply a maximum current of about 20 mA, which is enough to control small electronic components such as LEDs, buzzers, and small sensors.  
-However, when we want to build larger projects, we may need to control devices that require higher voltage or higher current, such as lamps, fans, pumps, or motors. The Arduino pins cannot supply enough power for these devices directly, and connecting them without protection may damage the board.   
-To solve this problem, we use relays. A relay is an electrically controlled switch that allows a low-power signal from the Arduino to control high-power devices safely. Inside the relay, there is a coil that plays a key role. When the Arduino sends a control signal, a small current flows through the coil, which produces a magnetic field. This magnetic field pulls a metal armature, causing the internal switch to close and allowing current to flow in the high-power circuit. When the Arduino stops sending the signal, the current in the coil stops, the magnetic field disappears, and a spring pushes the armature back to its original position, opening the switch again.
+The Arduino digital pins provide an output voltage of 5V or 3.3V, depending on the board and its power supply. These pins can supply a maximum current of about 20 mA, which is enough to control small electronic components such as LEDs, buzzers, and small sensors. However, when we want to build larger projects, we may need to control devices that require higher voltage or higher current, such as lamps, fans, pumps, or motors. To solve this problem, we use relays.    
+A relay is an electrically controlled switch that allows a low-power signal from the Arduino to control high-power devices safely. Inside the relay, there is a coil that plays a key role. When the Arduino sends a control signal, a small current flows through the coil, which produces a magnetic field. This magnetic field pulls a metal armature, causing the internal switch to close and allowing current to flow in the high-power circuit. When the Arduino stops sending the signal, the current in the coil stops, the magnetic field disappears, and a spring pushes the armature back to its original position, opening the switch again.
 
-<img src="./attachments/relay.png" />
+<img src="./attachments/relay.png" height="350px" />
 
 Let’s build a simple project using a relay and an ultrasonic sensor. In this project, we will use the ultrasonic sensor to turn a light ON when the user passes their hand in front of the sensor, and turn it OFF when the user passes their hand again.   
 
@@ -218,16 +221,16 @@ Control Side, Low Voltage:
 - **IN (Control Pin) → Pin 8** on the Arduino
 
 **High-Power Side** On the high-power side, the relay has three terminals: COM (Common), NO (Normally Open), and NC (Normally Closed). To control a lamp:
-- Connect the **live (phase) wire** from the power source to COM.
+- Connect the live (phase) wire from the power source to COM.
 - Connect the NO terminal to one wire of the lamp.
 - Connect the other wire of the lamp back to the neutral
 
 When the relay is activated, the internal switch closes between COM and NO (Normally Open), allowing current to flow and turning the lamp ON. At the same time, the connection between COM and NC (Normally Closed) is opened. When the relay is deactivated, the opposite happens.
 
-<img src="./attachments/relay_cicuit.png" />
+<img src="./attachments/relay_cicuit.png" height="350px"/>
 
-Now let’s create the program for our project. As always, we start with the **`setup()`** function, where we configure the pins. 
-We set Pin 10** (Trig) and Pin 8 (relay control) as output pins, and Pin 9 (Echo) as an input pin:
+Now let’s create the program for our project. As always, we start with the `setup()` function, where we configure the pins. 
+We set Pin 10 (Trig) and Pin 8 (relay control) as output pins, and Pin 9 (Echo) as an input pin:
 ```cpp
 void setup() {  
   pinMode(10, OUTPUT); 
@@ -244,7 +247,7 @@ We also create `duration` and `distance` variables to store the ultrasonic senso
 bool lightState = false, handDetected = false;
 float duration, distance;
 ```
-Next, inside the **`loop()`** function, we use the ultrasonic sensor to check if the user passes their hand in front of it.
+Next, inside the `loop()` function, we use the ultrasonic sensor to check if the user passes their hand in front of it.
 - If the measured distance is less than or equal to 20 cm and a hand hasn’t been detected yet, we toggle the light and set `handDetected` to true.
 - If the measured distance is greater than 20 cm, this means the hand has been removed, so we set `handDetected` to false.
 
@@ -271,21 +274,18 @@ void loop(){
 ```
 
 ### Pulse Width Modulation
-When we look closely at the digital pins on an Arduino board, we can notice that some pins have a special symbol (~) next to them. This symbol indicates that these pins support **Pulse Width Modulation (PWM)**.
-**Pulse Width Modulation (PWM)** is a technique used to simulate an analog output using a digital signal. Since Arduino digital pins can only output **HIGH (5V)** or **LOW (0V)**.   
-The principle of **Pulse Width Modulation (PWM)** is based on switching the output signal ON and OFF repeatedly during a constant time period T.
+When we look closely at the digital pins on an Arduino board, we can notice that some pins have a special symbol (~) next to them. This symbol indicates that these pins support Pulse Width Modulation (PWM).
+Pulse Width Modulation (PWM) is a technique used to simulate an analog output using a digital signal. Since Arduino digital pins can only output HIGH (5V) or LOW (0V).   
+The principle of Pulse Width Modulation (PWM) is based on switching the output signal ON and OFF repeatedly during a constant time period T.
 
-This fixed period T is called the PWM period, and within this period, the signal stays ON for a certain amount of time and OFF for the rest of the time, the percentage of time that the signal remains ON during one period is called the duty cycle.   
-The output voltage is determined by the **average value** of the signal over one complete period.
-For example (assuming a 5V system):
-- If the output stays ON for the entire period (100% duty cycle),  the average voltage will be **5V**.
-    
-- If the output never turns ON (0% duty cycle), the average voltage will be **0V**.
-    
-- If the output stays ON for half of the period (50% duty cycle), the average voltage will be **2.5V**.
+This fixed period T is called the PWM period, and within this period, the signal stays ON for a certain amount of time and OFF for the rest of the time, the percentage of time that the signal remains ON during one period is called the duty cycle, the output voltage is determined by the average value of the signal over one complete period, For example:
+- If the output stays ON for the entire period (100% duty cycle),  the average voltage will be 5V.  
+- If the output never turns ON (0% duty cycle), the average voltage will be 0V.
+- If the output stays ON for half of the period (50% duty cycle), the average voltage will be 2.5V.
 
-$$ V_{average}​=\frac{T_{on}}{T}   \times V_{max}​ = DutyCycle \times V_{max}​ $$
-
+```math
+V_{average}​=\frac{T_{on}}{T}   \times V_{max}​ = DutyCycle \times V_{max}​
+```
 To work with PWM in Arduino, we first configure the desired pin as an output inside the `setup()` function:
 ```
 void setup(){
@@ -300,18 +300,19 @@ Using this, we can calculate the duty cycle with the following equation:
 Duty\ Cycle (\%) = \frac{value}{255} \times 100
 ```
 By adjusting this value, we directly control the duty cycle, which controls the average voltage applied to the connected device.  
-
 ```math
 V_{average}​=\frac{value}{255}​×V_{max}​
 ```
-<img src="./attachments/PWM.png" />
+The diagram illustrates how the output varies depending on the duty cycle values.
+
+<img src="./attachments/PWM.png" height="350px"/>
 
 ### Analogue GPIO Pins
 The Arduino board has 6 analogue input pins (A0–A5), located on the left side of the board. Unlike digital pins, which can only read HIGH or LOW, analogue pins can read a continuous range of voltage values between 0V and 5V. This makes them ideal for working with sensors and components that produce varying signals, such as temperature sensors, light sensors, and potentiometers.
 
 <img src="./attachments/Analogue_GPIO.png" height="350px" />
 
-Each analogue pin is connected to a built-in Analogue-to-Digital Converter (ADC), which converts the incoming voltage into a digital value that the Arduino can process. The ADC has a 10-bit resolution, meaning it maps the input voltage to a value between **0** and **1023**.
+Each analogue pin is connected to a built-in Analogue-to-Digital Converter (ADC), which converts the incoming voltage into a digital value that the Arduino can process. The ADC has a 10-bit resolution, meaning it maps the input voltage to a value between 0 and 1023.
 
 This means:
 - 0V → 0
@@ -319,7 +320,8 @@ This means:
 - 5V → 1023
 
 Just like with digital pins, the Arduino provides specific functions to handle analog signals.  
-**`analogRead()`:** This function reads the value from the specified analog pin. It converts the input voltage into a digital integer value. It accepts one argument:
+**`analogRead()`:**   
+This function reads the value from the specified analog pin. It converts the input voltage into a digital integer value. It accepts one argument:
 - The pin number (e.g., A0, A1) It returns a value between 0 (for 0 volts) and 1023 (for 5 volts).
 
 We cannot send an analog output signal using the analog pins. On the Arduino Uno, the analog pins (A0–A5) are mainly designed to read analog inputs, However, even though they are labeled as analog pins, they can still be used as regular digital pins. This means we can use functions like `digitalWrite()` and `digitalRead()` with them, just like any other digital pin.
@@ -331,12 +333,12 @@ A potentiometer is one of the most commonly used analogue input components. It i
 When we turn the potentiometer , the voltage at the middle pin changes smoothly from 0V to 5V. The Arduino reads this and gives us a value between 0 and 1023.   
 
 Let’s build a project to control the brightness of an LED using a potentiometer. For this project, we will need a potentiometer, an LED, and a 220 Ω resistor.   
-First, connect the potentiometer’s two outer terminals to GND and 5V on the Arduino. Then, connect the middle terminal (wiper) of the potentiometer to the analog pin A0.  
+First, connect the potentiometer’s two outer terminals to GND and 5V on the Arduino. Then, connect the middle terminal of the potentiometer to the analog pin A0.  
 Next, connect the short leg of the LED (cathode) to GND, and the long leg (anode) to digital pin 9 through the 220 Ω resistor. We use pin 9 because it supports PWM, which allows us to simulate an analog signal to control the LED brightness smoothly.
 
-<img src="./attachments/circuit_potentipmeters.png" />
+<img src="./attachments/circuit_potentipmeters.png" height="350px"/>
 
-Now, let’s write the program. In the **`setup()`** function, we configure pin 9 as an output. We do not strictly need to configure A0 as input because analog pins are set to input by default.
+Now, let’s write the program. In the `setup()` function, we configure pin 9 as an output. We do not strictly need to configure A0 as input because analog pins are set to input by default.
 ```cpp
 void setup(){
   pinMode(9,OUTPUT);
@@ -347,8 +349,7 @@ Now, outside the `setup()` function, we declare a variable that will store the p
 ```cpp 
 int potValue;
 ```
-Finally, inside the `loop()` function, we start by reading the value from pin A0 using `analogRead()`. After that, we scale the retrieved value to match the PWM range by dividing it by 4. We do this because the analog input gives values from 0 to 1023, while PWM output works with values between 0 and 255.   
-By dividing 1023 by 4, we approximately map the range to 0–255.   
+Finally, inside the `loop()` function, we start by reading the value from pin A0 using `analogRead()`. After that, we scale the retrieved value to match the PWM range by dividing it by 4. We do this because the analog input gives values from 0 to 1023, while PWM output works with values between 0 and 255, by dividing 1023 by 4, we approximately map the range to 0–255.   
 Then, we send this scaled value to pin 9 using `analogWrite()` to control the LED brightness.  
 ```cpp
 void loop() {  
@@ -357,8 +358,7 @@ void loop() {
   analogWrite(9, potValue);  
 }
 ```
-Arduino provides a built-in function that allows us to scale values easily. This function is called `map()`. Instead of manually dividing or calculating the conversion, we can use this function to convert a number from one range to another.
-The `map()` function takes **five arguments**, and its general form is:
+Arduino provides a built-in function that allows us to scale values easily. This function is called `map()`. Instead of manually dividing or calculating the conversion, we can use this function to convert a number from one range to another, this function takes five arguments, and its general form is:
 ```cpp
 map(value, fromLow, fromHigh, toLow, toHigh);
 ```
@@ -377,17 +377,16 @@ void loop() {
 }
 ```
 #### Light Dependent Resistor
-An LDR (Light Dependent Resistor), or photoresistor, is another widely used analog input component. It is a special type of resistor whose resistance changes based on the amount of light it is exposed to.
+An LDR (Light Dependent Resistor), or photoresistor, is a special type of resistor whose resistance changes based on the amount of light it is exposed to.
 - In **darkness**, its resistance is very high.    
 - In **bright light**, its resistance becomes very low.
-    
 
 Unlike a potentiometer, an LDR only has two terminals. To read its changing resistance with an Arduino, we must pair it with a standard fixed resistor (usually 10k Ω) to create a setup called a voltage divider.   
 
 A voltage divider is a simple circuit made of two or more resistors connected in series. When we apply a voltage across them, the total voltage is divided between them according to their resistance values.   
 The output voltage is taken from the point between the two resistors, and its value depends on the ratio of the resistances.
 
-<img src="./attachments/Voltage_divisor.png" />
+<img src="./attachments/Voltage_divisor.png" height="150px" />
 
 The voltage divider equation is:
 ```math
@@ -397,17 +396,17 @@ V_1 =V_{in}\times \frac{R_1}{R_1+R_2}
 V_2 =V_{in}\times \frac{R_2}{R_1+R_2}
 ```
 Let’s build a project to create an automatic night light that turns on an LED when it gets dark. For this project, we will need an LDR, a 10k Ω resistor, an LED, and a 220 Ω resistor.
-First, connect one leg of the LDR to 5V on the Arduino. Then, connect the other leg of the LDR to both the analog pin A0 and to one end of the 10k Ω resistor. Finally, connect the other end of the 10k Ω resistor to GND.
+First, connect one leg of the LDR to GND on the Arduino. Then, connect the other leg of the LDR to both the analog pin A0 and to one end of the 10k Ω resistor. Finally, connect the other end of the 10k Ω resistor to 5v.
 
 Next, connect the short leg of the LED (cathode) to GND, and the long leg (anode) to digital pin 7 through the 220 Ω resistor. We will use pin 7 as a simple digital output to turn the LED on or off.
 
-<img src="./attachments/Ldr_circuit.png" />
+<img src="./attachments/Ldr_circuit.png" height="350px"/>
 
-With this circuit, the voltage at pin **A0** is the output voltage of the voltage divider, which depends on the LDR’s resistance. Since the LDR is a variable resistor, its resistance changes according to the light intensity.
-- When **light intensity increases**, the **resistance of the LDR decreases**, which causes the output voltage at A0 to decrease .
-- When **light intensity decreases (darkness)**, the **resistance increases**, which causes the output voltage at A0 to increase.
+With this circuit, the voltage at pin A0 is the output voltage of the voltage divider, which depends on the LDR’s resistance. Since the LDR is a variable resistor, its resistance changes according to the light intensity.
+- When light intensity increases, the resistance of the LDR decreases, which causes the output voltage at A0 to decrease .
+- When light intensity decreases (darkness), the resistance increases, which causes the output voltage at A0 to increase.
 
-Now, let's write the program. In the **`setup()`** function, we configure pin 7 and pin A0 as input.
+Now, let's write the program. In the `setup()` function, we configure pin 7 and pin A0 as input.
 ```cpp
 void setup() { 
 	pinMode(7, OUTPUT); 
@@ -431,12 +430,10 @@ void loop() {
 ```
 
 #### Flame Sensor
-Another important sensor is the flame sensor. It allows us to detect fire or flames by sensing infrared (IR) light emitted by flames. Since Flames emit radiation across visible and infrared wavelengths. The flame sensor is designed to detect infrared light, typically in the **760–1100 nm** range. Unlike an LDR circuit that usually requires an external voltage divider, the flame sensor module already includes the necessary resistors and signal conditioning circuitry, so no external divider is required.    
-The flame sensor usually has **four pins**: VCC, GND, DO (Digital Output), and AO (Analog Output).
-- The **VCC** pin is used to power the sensor.
-- The **GND** pin is connected to ground.
-- The **DO pin** provides a digital signal (HIGH or LOW) when a flame is detected.
-- The **AO pin** provides an analog signal that changes depending on the intensity of the flame.
+The flame sensor detects fire by sensing infrared (IR) light emitted by flames, Since Flames emit radiation across visible and infrared wavelengths. The flame sensor is designed to detect infrared light in ragne of 760–1100 nm. Unlike an LDR circuit that usually requires an external voltage divider, the flame sensor module already includes the necessary resistors and signal conditioning circuitry. The module usually has four pins: VCC, GND, DO (Digital Output), and AO (Analog Output).
+
+- DO pin: Provides a HIGH or LOW signal to indicate whether a flame is detected, based on a built-in comparator threshold adjusted by a potentiometer on the module.
+- AO pin: Outputs a continuous voltage depending on the intensity of the flame.   
 
 The sensing element in the module is an infrared photodiode. When infrared radiation from a flame reaches the photodiode, it generates a small electrical signal. The strength of this signal depends on the intensity of the flame.  This signal is sent to two different parts of the module:
 
@@ -449,15 +446,13 @@ The AO pin outputs a voltage that changes continuously depending on the intensit
 - If the flame is weak or far away, the output voltage is lower.
 - If the flame is strong or closer, the output voltage is higher.
 
-Let’s put this into practice by building a simple project for flame detection. When a flame is detected, a buzzer will produce a sound.   
-For this project, we will need one active buzzer and a flame sensor module.   
-First, connect the **GND** and **VCC** pins of the flame sensor module to the GND and VCC pins on the Arduino.  
-Next, connect the AO (analog output) pin of the flame sensor to the A0 pin on the Arduino board.  
-After that, connect the buzzer to the Arduino. Connect the GND pin of the buzzer to the Arduino GND, and connect the other pin of the buzzer to digital pin 7 on the Arduino.   
+Let’s put this into practice by building a simple project for flame detection. When a flame is detected, a buzzer will produce a sound, for this project, we will need one active buzzer and a flame sensor module.   
+First, connect the GND and VCC pins of the flame sensor module to the GND and VCC pins on the Arduino.  
+Next, connect the AO (analog output) pin of the flame sensor to the A0 pin on the Arduino boar, we connect buzzer to the Arduino the GND pin of the buzzer to the Arduino GND, and connect the other pin of the buzzer to digital pin 7 on the Arduino.   
 
-<img src="./attachments/fire_circuit.png" />
+<img src="./attachments/fire_circuit.png" height="350px"/>
 
-Now let’s create the program for our project.  First, inside the **`setup()`** function, we configure the pins. We set pin 7 as an OUTPUT because it is connected to the buzzer, and we set pin A0 as an INPUT since it receives the signal from the flame sensor.
+Now let’s create the program for our project.  First, inside the `setup()` function, we configure the pins. We set pin 7 as an OUTPUT because it is connected to the buzzer, and we set pin A0 as an INPUT since it receives the signal from the flame sensor.
 ```cpp
 void setup() {  
   pinMode(7, OUTPUT);  
