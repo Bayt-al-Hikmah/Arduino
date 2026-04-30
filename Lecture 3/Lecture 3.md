@@ -476,35 +476,26 @@ void loop() {
 }
 ```
 #### Soil Moisture Sensor
-Another extremely useful device is the soil moisture sensor, a tiny device that measures the water level in soil. They can work alone or in automated systems for real-time monitoring, making them crucial for several applications in agriculture, gardening, environmental monitoring, and more.
+Soil moisture sensor is a tiny device that measures the water level in soil. They can work alone or in automated systems for real-time monitoring, making them crucial for several applications in agriculture, gardening, environmental monitoring, and more.
 
 There are different types of sensors, but we can divide them into two main groups: resistance-based and capacitance-based.
 - **Resistance-based** devices have two exposed electrodes. As soil moisture increases, its conductivity increases, causing the electrical resistance between the electrodes to drop.
 - **Capacitance-based** sensors measure the dielectric permittivity of the soil. The presence of water changes this permittivity, which alters the sensor's capacitance.
 
-<img src ="./attachments/soil_sensor.png" />
+<img src ="./attachments/soil_sensor.png" height="300px"/>
 
-The capacitive soil moisture sensor usually has three pins: VCC, GND, and OUT.
-- **VCC** is used to power the sensor.
-- **GND** is connected to ground.
-- **OUT** is the output pin that provides an **analog voltage signal**.
+The capacitive sensor measures the dielectric properties of the soil. Because of this, it is less affected by corrosion and usually lasts longer, it has three pins: VCC, GND, and OUT, the output pin releases a voltage that changes depending on the soil moisture level:
+- When the soil is very wet, the sensor outputs a lower voltage.
+- When the soil becomes drier, the sensor outputs a higher voltage.
 
-The capacitive sensor measures the dielectric properties of the soil. Because of this, it is less affected by corrosion and usually lasts longer.   
-The output pin releases a voltage that changes depending on the soil moisture level:
-- When the soil is **very wet**, the sensor outputs a **lower voltage**.
-- When the soil becomes **drier**, the sensor outputs a **higher voltage**.
-
-On the other hand, the resistance-based soil moisture sensor works by measuring the electrical resistance of the soil. The sensing probe usually has two exposed electrodes that are inserted into the soil. When the soil contains more water, it becomes more conductive, which means the resistance between the electrodes decreases. When the soil is dry, the resistance increases.   
-This type of sensor is the most common and inexpensive option. However, the probe itself usually has only two pins, so it cannot be connected directly to the Arduino. Instead, it requires an external module that processes the signal.   
-The sensor module acts as an interface between the probe and the Arduino. It typically has **four pins**: VCC, GND, AO (Analog Output), and DO (Digital Output).
+On the other hand, the resistance-based soil moisture sensor works by measuring the electrical resistance of the soil. The sensing probe usually has two exposed electrodes that are inserted into the soil. When the soil contains more water, it becomes more conductive, which means the resistance between the electrodes decreases. When the soil is dry, the resistance increases, this type of sensor is the most common and inexpensive option. However, the probe itself usually has only two pins, so it cannot be connected directly to the Arduino. Instead, it requires an external module that processes the signal, the module acts as an interface between the probe and the Arduino,it includes a comparator circuit and a potentiometer. The potentiometer allows us to adjust the moisture threshold for the digital output. It typically has four pins: VCC, GND, AO (Analog Output), and DO (Digital Output).
 - **VCC** powers the module.
 - **GND** connects to ground.
-- **AO** outputs an **analog voltage** that changes depending on the soil moisture level.
-- **DO** provides a **digital signal** that becomes HIGH or LOW when the moisture level crosses a threshold.
+- **AO** outputs an **analog voltage that changes depending on the soil moisture level.
+- **DO** provides a digital signal that becomes HIGH or LOW when the moisture level crosses a threshold.
+ 
 
-The module also includes a comparator circuit and a potentiometer. The potentiometer allows us to adjust the moisture threshold for the digital output.    
-
-Let’s build an automated plant-watering system: when the soil becomes too dry, the Arduino will trigger a 12V water pump to water your plant for you!
+Let’s build an automated plant-watering system: when the soil becomes too dry, the Arduino will trigger a 12V water pump to water the plants.  
 
 For this project, we will need:
 - Resistance-based soil moisture sensor with module
@@ -518,9 +509,9 @@ Next, let's wire the relay to the Arduino, we connect the VCC and GND pins of th
 
 Finally, we wire the high-voltage side with the pump and 12V battery, we connect the negative (-) terminal of the 12V battery directly to the negative wire of the water pump. and the positive (+) terminal of the 12V battery to the COM (Common) terminal on the relay. After that we Connect the positive wire of the water pump to the NO (Normally Open) terminal on the relay.
 
-<img src="./attachments/pump_circuit.png" />
+<img src="./attachments/pump_circuit.png" height="350px"/>
 
-Now let’s create the program for our project. First, inside the **`setup()`** function, we configure our pins. We set pin 8 as an OUTPUT, and we set pin A0 as an INPUT.
+Now let’s create the program for our project. First, inside the `setup()` function, we configure our pins. We set pin 8 as an OUTPUT, and we set pin A0 as an INPUT.
 ```cpp
 void setup() {  
   pinMode(8, OUTPUT);  
@@ -531,7 +522,7 @@ Next, we create a variable to store the value retrieved from the sensor.
 ```cpp
 int moistureValue;
 ```
-Finally, inside the **`loop()`** function, we continuously read the value from the A0 pin. If the value is greater than 600 which mean the soil is dry, we set pin 8 HIGH. This activates the relay and turns the 12V pump on. Otherwise, if the value is lower meaning the soil is wet enough, we turn the relay off by setting pin 8 LOW. We also add a small delay at the end to prevent the relay from clicking rapidly if the moisture reading fluctuates right at the 600 mark.
+Finally, inside the `loop()` function, we continuously read the value from the A0 pin. If the value is greater than 600 which mean the soil is dry, we set pin 8 HIGH. This activates the relay and turns the 12V pump on. Otherwise, if the value is lower meaning the soil is wet enough, we turn the relay off by setting pin 8 LOW. We also add a small delay at the end to prevent the relay from clicking rapidly if the moisture reading fluctuates right at the 600 mark.
 ```cpp
 void loop() {  
   moistureValue = analogRead(A0);  
