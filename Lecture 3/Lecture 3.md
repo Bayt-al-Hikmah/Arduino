@@ -544,19 +544,19 @@ Motors do not come in only one form. There are **many different types of motors*
 The standard Direct Current (DC) motor is the most common type of motor we will encounter. It provides continuous rotational motion.   
 A DC motor works on the principle of electromagnetism (Lorentz force principle). Inside the motor, there is a coil of wire (the armature) placed between the poles of a permanent magnet. When an electric current flows through the coil, it generates a magnetic field that pushes against the permanent magnet, causing the coil to spin. A mechanical component called a "commutator" constantly reverses the current direction to keep the motor spinning continuously in one direction. The speed of the motor depends on the supplied voltage, and the direction of rotation depends on the polarity of the voltage applied to the motor terminals.
 
-<img src="./attachments/Dc_motor.png" />
+<img src="./attachments/Dc_motor.png" height="350px"/>
 
 
 An Arduino digital pin can only supply about 20 mA of current, which can't directly power most DC motors . We must use a Motor Driver (like the L298N or L293D) or Transistor circuit to power and control the motor.   
 The drivers is integrated circuit that contain an "H-Bridge" circuit, which allows us to safely provide high current from an external battery and easily reverse the motor's direction.  
 
-<img src="./attachments/H_bridge.png" />
+<img src="./attachments/H_bridge.png" height="350px"/>
 
 To use a DC motor with an L298N motor driver, we connect the motor to the driver's output terminals. After that we connect the driver's power pins to a battery and ground. Then, connect the driver's control pins to the Arduino.
 - **IN1 and IN2** control the rotation direction. We set one **HIGH** and the other **LOW** to select the direction.
 - **ENA** controls the motor speed using PWM.
 
-<img src="./attachments/circuit_Dc.png" />
+<img src="./attachments/circuit_Dc.png" height="350px" />
 
 the program will be as following
 ```cpp
@@ -582,11 +582,11 @@ A servo motor doesn't spin continuously like a regular DC motor. Instead, it is 
 
 A servo is a "closed-loop" system. Inside its casing, there is a small DC motor, a gearbox to slow it down and increase torque, and a potentiometer (variable resistor) connected to the output shaft. As the motor turns, the potentiometer turns with it, constantly measuring the current angle and feeding that information back to an internal control circuit. The control circuit receives a PWM control signal and compares the desired position with the current position measured by the potentiometer. if the positions are different, the motor rotates until the correct angle is reached.
 
-<img src="./attachments/Servo_motor.png" />
+<img src="./attachments/Servo_motor.png" height="350px" />
 
 The Servo motor have 3 pins ,Gnd VCC and control pins where we send the PWM signals, Arduino have  built-in Servo library, that simplify for us controlling the servo motor, Let's make simple circuit to see how that work, we start with connecting the servo's Red wire to 5V, Brown/Black wire to GND, and Yellow/Orange wire to a PWM pin (like Pin 9). 
 
-<img src="./attachments/servo_circuit.png" />
+<img src="./attachments/servo_circuit.png" height="350px" />
 
 
 In the program, we first include the **Servo** library and create a **Servo object**. Inside the **setup()** function, we attach the servo to **pin 9**. Finally, inside the **loop()** function, we use the **write()** function to specify the position that the servo motor should move to.
@@ -612,7 +612,7 @@ Brushless DC motors are high-performance motors known for their incredible speed
 In a standard DC motor, the permanent magnets are on the outside (stator) and the electromagnet coils spin on the inside (rotor). A BLDC motor flips this design: the coils remain stationary on the outside, and a permanent magnet spins on the inside. Because there is no mechanical commutator to switch the current in the coils, an external electronic controller must rapidly switch the power to the coils in a precise sequence to drag the magnetic rotor around. This switching creates a rotating magnetic field that causes the rotor to spin.  
 A BLDC motor typically has three input wires, which correspond to the three stator phases (often labeled A, B, and C). Each wire connects to one set of coils inside the motor.  
 
-<img src="./attachments/BLDC.png" />
+<img src="./attachments/BLDC.png" height="350px" />
 
 BLDC motor requires an Electronic Speed Controller (ESC). The ESC handles the heavy lifting of switching the high-current phases at incredibly fast speeds. The ESC receives a control signal that represents the desired motor speed. Using power transistors (usually MOSFETs), it rapidly switches the DC supply between the motor’s three windings. This switching sequence energizes the coils one after another, which produces a rotating magnetic field that causes the rotor magnets to follow and spin.  
 To control the speed, the ESC uses Pulse Width Modulation (PWM). By adjusting the width of the pulses, the ESC controls how much power is delivered to the motor. Wider pulses supply more power and increase the speed, while narrower pulses reduce power and slow the motor down. In many systems, the ESC also monitors feedback (such as back EMF) from the motor to maintain smooth and efficient operation.
@@ -622,7 +622,7 @@ Let’s build a simple project to control a brushless motor using an Arduino. Fo
 First, connect the GND and VCC (5V) wires from the ESC control cable to the Arduino GND and 5V pins. Then connect the signal (control) wire from the ESC to Arduino pin 9, which will send the PWM signal used to control the motor speed. Next, connect the battery to the ESC’s power input to supply the required power. Finally, connect the three wires of the brushless motor to the three output wires of the ESC. These wires correspond to the three motor phases and allow the ESC to drive the motor by switching the current between them.
 
 
-<img src="./attachments/Brushless_circuit.png" />
+<img src="./attachments/Brushless_circuit.png" height="350px" />
 
 For the program, we can use the Servo library to control the brushless motor.  Setting the servo value to 180 degrees gives the motor full speed, while setting it to 0 degrees will stop the motor. Other values between **0 and 180** control the motor speed gradually.
 
@@ -648,11 +648,11 @@ For more control over our brushless motor, we can use the `esc.writeMicroseconds
  A stepper motor is a motor that rotates in small precise steps instead of continuous rotation, each electrical pulse moves the motor by a fixed angle. If a motor has a 1.8-degree step angle, it takes exactly 200 steps to make one full revolution. They are excellent for precise positioning without needing feedback, making them the backbone of 3D printers and CNC machines.  
 A stepper motor contains a central, toothed, gear-like magnetic rotor surrounded by multiple electromagnetic coils (stators) organized into "phases." By energizing these coils one by one in a specific sequence, the teeth of the rotor are magnetically pulled into alignment with the energized coil, causing the motor to step forward by a fraction of a degree.
 
-<img src="./attachments/Stepper_motor.png"/>
+<img src="./attachments/Stepper_motor.png" height="350px"/>
 
 Stepper motors, like brushless motors, require specialized drivers to operate correctly. The driver acts as the “brain” between the control system (arduino) and the motor itself. It receives control signals, usually in the form of step pulses and direction commands, and translates them into precise sequences of electrical signals that energize the motor coils in the proper order. The driver controls which coils are energized at each moment, ensuring the rotor moves incrementally and precisely to the desired position. Some drivers also provide features like current limiting, microstepping (dividing steps into smaller increments for smoother motion), and protection against overheating. Common stepper motor drivers include the A4988, DRV8825, and ULN2003 
 
-<img src="./attachments/driverr.png" />
+<img src="./attachments/driverr.png" height="350px"/>
 
 The A4988 driver has 16 pins, usually arranged in two rows: one for motor power and one for control logic. Here’s what each pin does:
 - **VMOT** Connects to the motor power supply (typically 8–35 V). Powers the stepper motor coils.
@@ -680,7 +680,7 @@ The A4988 driver has 16 pins, usually arranged in two rows: one for motor power 
 Let’s make a simple example using a 12 V stepper motor and a stepper motor driver A4988. We start by connecting the stepper motor coil 1 to the A1 & B1 pins on the driver and coil 2 to the B1 & B2 pins. Next, we connect VMOT to the 12 V battery positive terminal and GND to the battery negative terminal.   
 After that, we start connecting the driver to the Arduino. We connect the GND pin at the bottom of the driver to the Arduino GND, the VDD to Arduino 5 V, and finally we connect the DIR pin and the STEP pin to the Arduino pins 7 and 8.
 
-<img src="./attachments/step_circuit.png" />
+<img src="./attachments/step_circuit.png" height="350px"/>
 
 Now let’s create a simple program to control our stepper motor. We start by configuring pins 8 and 7 as output pins inside the `setup()` function. After that, we can control the motor inside the `loop()` function.
 
