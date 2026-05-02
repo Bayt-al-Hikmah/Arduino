@@ -445,14 +445,14 @@ Inside the breadboard, the holes are connected in specific patterns:
 - **Terminal strips (middle area):**  In the center of the breadboard, the holes are connected in small horizontal groups, typically in rows of five. Each group of five holes is connected internally. This means if you place a wire or component leg in one hole, it is electrically connected to the other four holes in the same row.
 - **Central gap:**  The middle gap separates the two sides of the breadboard. This gap is designed to place integrated circuits (ICs) so that their pins do not connect to each other by mistake.
 
-<img src="./attachments/Beardboard.png" />
+<img src="./attachments/Beardboard.png" height="300px"/>
 
 #### Push Button
 A push button is a simple input component that allows us to control a circuit by pressing it. When the button is not pressed, the internal contacts are open, so no current flows. When we press the button, the contacts close and allow current to pass through.
 
 Inside the push button, the pins are connected as following:
 
-<img src="./attachments/push_button.png" />
+<img src="./attachments/push_button.png" height="200px"/>
 
 #### Wiring
 Lets start making our prokect by building the circuit, we will need 1 LED, 1 push button and 2 resistors (220Ω), First, connect the GND and 5V (VCC) pins from the Arduino board to the power rails of the breadboard. This allows us to easily access power and ground anywhere on the board.    
@@ -464,7 +464,7 @@ We use a pull-down resistor to make sure the Arduino reads a stable and correct 
 
 The pull-down resistor connects the input pin to GND when the button is not pressed, forcing it to read LOW in a stable way. When the button is pressed, the pin connects to **5V** and reads HIGH. 
 
-<img src="./attachments/circuit.png" />
+<img src="./attachments/circuit.png" height="300px"/>
 
 #### Creating The Program
 We connect the Arduino to our computer using a USB cable. and set the Arduino IDE so we can upload the program.  
