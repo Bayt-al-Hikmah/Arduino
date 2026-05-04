@@ -42,7 +42,7 @@ Let’s create a simple project to display a heart on the LED matrix. First, we 
 Start by connecting the **VCC** and GND pins of the Arduino to the VCC and GND pins of the MAX7219 module.  
 Next, connect the three control pins between the Arduino and the driver: connect Data (DIN) to pin 13, CLK to pin 11, and CS to pin 12 of the Arduino. These three pins will handle the communication between the Arduino and the MAX7219.
 
-<img src="./attachments/circuit.png" />
+<img src="./attachments/circuit.png" height="300px"/>
 
 Now let’s create our program to control the MAX7219. We will use the **LedControl** library, First, we include the library in our program. After that, we create an object of the LedControl class. In the constructor, we pass the pins used for communication: 13 for DIN (Data), 11 for CLK (Clock), and 12 for CS (Chip Select). We also specify the number of LED matrices connected, which in this case is 1.   
 ```
@@ -85,7 +85,7 @@ void loop() {
 The library provide us additional function to work with the matrix led for example
 - ``lc.setLed(0, row, col, state)`` to light individual pixels
 - ``lc.setColumn(0, col, value)`` to control by column instead of row
-
+#### Multiple Led Matrix
 If we want to use more than one LED matrix for example 16×8, 24×8, or 32×8 displays, we connect several MAX7219 modules in series. In this case, we must change the configuration when creating the `LedControl` object.   
 When we create the object, the last parameter specifies the number of devices (matrices) connected.
 ```cpp 
@@ -119,16 +119,20 @@ Finally when displaying data, we specify the device address as the first paramet
 lc.setRow(0, 0, B11111111); // first matrix  
 lc.setRow(1, 0, B11111111); // second matrix
 ```
-
 ### Seven Segment Display
-Seven-segment displays are digital displays made up of seven LED segments arranged to form numbers 0-9 and some letters. These segments are labeled with letters from **A** to **G**. By turning on specific combinations of these segments, we can form any number. For example, to display the number "1", we turn on segments B and C.     
+Seven-segment displays are digital displays made up of seven LED segments arranged to form numbers 0-9 and some letters. These segments are labeled with letters from A to G. By turning on specific combinations of these segments, we can form any number.     
+For example, to display the number "1", we turn on segments B and C.  
+<img src="./attachments/7_segment.png" height="300px"/>
+
 There are two main types of seven-segment displays:
 - **Common Cathode:** All the negative pins (GND) of the LEDs are connected together. We send a HIGH signal to a segment's pin to turn it ON.
 - **Common Anode:** All the positive pins (VCC) of the LEDs are connected together. We send a LOW signal to a segment's pin to turn it ON.
 
-<img src="./attachments/7_segment.png" />
+If we try to control each segment individually, we would need 7 GPIO pins. This works fine for a single display, but when using multiple 7-segment digits, we would quickly run out of available GPIO pins.
 
-If we attempted to control each segment directly, we would need **8 digital pins** from the Arduino (7 segments plus the decimal point). While this approach works for a single digit, it quickly becomes inefficient when working with multiple digits.  To solve this problem, some 7-segment displays are used with a BCD-to-7-segment decoder/encoder, which reduces the number of required Arduino pins from 7 to only 4 control pins.  In this case, the information is sent using BCD (Binary-Coded Decimal) encoding, where each decimal digit is represented by its binary equivalent. We can use the following table:
+To address this, many 7-segment displays are paired with a BCD-to-7-segment decoder. This approach reduces the number of required GPIO pins from 7 down to just 4 control pins. Instead of driving each segment directly, we send the digit value using BCD (Binary-Coded Decimal) encoding, where each decimal digit is represented by its binary equivalent.
+
+The decoder then translates this binary input into the appropriate signals to illuminate the correct segments. The corresponding mapping can be seen in the table below:
 
 | Decimal Digit | BCD (a,b,c,d) |
 | ------------- | ------------- |
@@ -143,40 +147,63 @@ If we attempted to control each segment directly, we would need **8 digital pins
 | 8             | 1000          |
 | 9             | 1001          |
 
-<img src="./attachments/bcd_7segmen.png" />
 
-In many applications, we need to display numbers larger than a single digit, such as two-digit, four-digit, or more. A four-digit 7-segment display is created by combining four individual 7-segment displays into a single module. Each digit has an additional control pin that determines which digit is currently active. For example, pins D1, D2, D3, and D4 control which of the four 7-segment digits is enabled, while the segment pins a, b, c, d, e, f, g, and DP control which LEDs light up in the selected digit.
+For example, with a common cathode 7-segment display, we can display the digit "3" by sending a BCD signal  of (low, low, high, high), as shown below:  
 
-<img src="./attachments/4digit_7segment.png" />
+<img src="./attachments/bcd_7segmen.png" height ="250px"/>
 
-If we tried to control all four digits manually, we would need 12 pins: 8 pins for segments and 4 pins for digit selection. To reduce the number of pins, we can use a BCD  encoder, which allows us to drive all four digits using only 9 pins (4 for BCD input + 5 for segments including the decimal point) we can use 8 if we remove the decimal point.
+### Four-digit 7-segment
+In many applications, we need to display numbers with more than one digit, such as two-digit, four-digit, or larger values. A four-digit 7-segment display is formed by combining four individual 7-segment digits into a single module. This is achieved by connecting all corresponding segment pins together, while adding a separate control (select) pin for each digit to determine which one is active at any given time.
 
-<img src="./attachments/encoder4digit.png" />
+<img src="./attachments/4digit_7segment.png" height="300px"/>
 
-The **TM1637** is the most popular driver for 4-digit, 7-segment displays because it reduces a complex wiring setup which would normally require 8 or more pins to just two control pins (plus power).    
-Inside the chip, there is a specialized SRAM data set and a 7-segment decoder. It handles the multiplexing automatically, meaning it switches between the four digits so rapidly that they appear to be on simultaneously, the control pins are :
-- **DIO (Data Input/Output):** This pin is a two-way street. Not only does the Arduino send segment data in, but the TM1637 sends an ACK (Acknowledgment) bit back to the Arduino after every byte to confirm it was received. 
-- **CLK (Clock Pin):** This is the heartbeat of the communication. The TM1637 "reads" the data on the DIO pin during the falling edge of the clock signal. 
+If we tried to control all four digits manually, we would need 12 pins: 8 pins for segments and 4 pins for digit selection. To reduce the number of pins, we can use a BCD encoder, which allows us to drive all four digits using only 9 pins (4 for BCD input + 5 for segments including the decimal point) we can use 8 if we remove the decimal point.
 
-To communicate with the TM1637, the Arduino first sends a Start Signal by pulling the DIO (Data) line low while the CLK (Clock) line remains high, signaling the chip to wake up and listen. Next, the Arduino sends an 8-bit Command one bit at a time, where each bit is sampled by the chip on the falling edge of the clock. After every 8 bits, the TM1637 pulls the DIO line low for one clock cycle this is the ACK, a handshake that confirms the byte was received. The Arduino then sends the Address of the specific digit it wants to update, followed by the Segment Data . Finally, the Arduino sends a Stop Signal by pulling DIO high while CLK is high. This "latches" the data into the internal memory, and the TM1637’s built-in multiplexer immediately takes over, rapidly scanning the digits to keep them lit without any further help from the Arduino.
+<img src="./attachments/encoder4digit.png" height="350px"/>
 
-Arduino provides the TM1637Display.h library, which simplifies working with the display by offering a simplified interface that handles all the clock signaling and synchronization internally.
+#### The TM1637
+The TM1637 is a dedicated LED drive control circuit commonly used with four-digit 7-segment displays. Much like the MAX7219, its primary goal is to drastically reduce the number of GPIO pins needed to drive the display. While a standard 4-digit display might require up to 12 pins, the TM1637 reduces this to just two communication pins, alongside power and ground.
 
-Let’s create a simple counter project that counts from 99 down to 0. We start by building the circuit: connect the GND pin of the TM1637 to the GND of the Arduino, and the VCC pin to the VCC of the Arduino. After that, connect the CLK pin to pin 2 on the Arduino, and finally connect the DIO pin to pin 3.
+We communicate with the TM1637 using a 2-wire serial protocol that is very similar to I2C, though it lacks device addressing. The data flow is managed using these two pins:
+- **Data pin (DIO):** This bidirectional pin is used to transfer data into and out of the chip. We send commands and display data over this line, one bit at a time.
+- **Clock pin (CLK):** This provides the timing for the data transfer. Data on the DIO pin must be stable while the clock is high, and it can only change state while the clock is low.
 
-<img src="./attachments/TM1637.png" />
+Unlike MAX7219 which relies on a Chip Select (CS) pin to indicate the start and end of a transmission, the TM1637 relies on specific signaling conditions on the data and clock lines:
+- START condition: The transmission begins when the DIO line is pulled LOW while the CLK line remains HIGH.
+- STOP condition: The transmission ends when the DIO line is pulled HIGH while the CLK line is HIGH.
+- Data Transmission: Between the start and stop conditions, 8 bits of data are sent, Least Significant Bit (LSB) first. After the 8 bits are sent, a 9th clock pulse is generated to allow the TM1637 to send an Acknowledge (ACK) signal by pulling the DIO line low, after that we can set the stop condition to stop data transmission or we can send another pack of data.
 
-To work with the TM1637 display driver, we first include the TM1637 library in our code. After that, we create an object for the display and specify the **CLK** and **DIO** pins that connect the module to the microcontroller.  
-Next, inside the setup() function, we initialize the display and set the brightness level.
+<img src="./attachments/diagram2.png" height="300px" />
 
-Finally, in the loop() function, we can write data to the display. To show numbers, we use the function showNumberDec(). In this example, we create a for loop that counts from 99 down to 0 to display a countdown on the screen. After each number is displayed, we add a small delay of 500 milliseconds so the numbers change at a visible speed.
+In Arduino we have the ``TM1637Display.h`` library, which simplifies working with the display by offering a simplified interface that handles all the clock signaling and synchronization internally.
 
+Let’s create a simple counter project that counts from 99 down to 0. We start by building the circuit, we connect GND and VCC of the TM1637 with thee GND and VCC the Arduino. After that, connect the CLK pin to pin 2 on the Arduino, and finally connect the DIO pin to pin 3.
+
+<img src="./attachments/TM1637.png" height="300px"  />
+
+Now in our sketch we include the TM1637 library. After that, we create an object for the display and specify the **CLK** and **DIO** pins that connect the module to the microcontroller. 
 ```cpp
 #include <TM1637Display.h>  
-  
 
 // Create the display object  
 TM1637Display display(2, 3);  
+```
+Next, inside the setup() function, we initialize the display and set the brightness level.
+```
+void setup() {  
+	display.setBrightness(5);  
+}  
+```
+Finally, in the loop() function, we can write data to the display. To show numbers, we use the function showNumberDec().   
+The `showNumberDec` take two arguments: 
+- The number to display  
+- A boolean value (`true` or `false`)  determine whether leading zeros should be displayed.
+    - `true` leading zeros are shown (for example: **0007**, **0023**).
+    - `false` leading zeros are hidden (for example: **7**, **23**).
+
+In this example, we create a for loop that counts from 99 down to 0 to display a countdown on the screen. After each number is displayed, we add a small delay of 500 milliseconds so the numbers change at a visible speed.
+
+```cpp
   
 void setup() {  
 	display.setBrightness(5);  
@@ -192,20 +219,14 @@ void loop() {
 	}  
 }
 ```
-The `showNumberDec` take two arguments: 
-- The number to display  
-- A boolean value (`true` or `false`)  determine whether leading zeros should be displayed.
-    - `true` leading zeros are shown (for example: **0007**, **0023**).
-    - `false` leading zeros are hidden (for example: **7**, **23**).
+The library also provides other useful functions to work with the display device.   
 
-
-The library also provides other useful functions to work with the display device.
-`showNumberDecEx()`  This function is similar to **`showNumberDec()`**, but it allows extra control over the **dots or colon** on the display (useful for clocks or timers).
+**`showNumberDecEx()`** This function is similar to **`showNumberDec()`**, but it allows extra control over the **dots or colon** on the display (useful for clocks or timers).
 ```cpp
 display.showNumberDecEx(1234, 0b01000000, true); // turn on the colon
 display.showNumberDecEx(1234, 0b10000000, true);   // turn on a dot
 ```
-`setSegments()`  This function allows us to **send raw segment data directly** to the 7-segment display.   Each byte represents which **segments (a–g)** should be turned on for a digit.
+**`setSegments()`** This function allows us to send raw segment data directly to the 7-segment display.   Each byte represents which segments (a–g) should be turned on for a digit.
 ```cpp
 uint8_t data[] = {0x3f, 0x06, 0x5b, 0x4f};  
 display.setSegments(data);
