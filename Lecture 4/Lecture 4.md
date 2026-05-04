@@ -244,7 +244,7 @@ So this array represents the digits:
 0 1 2 3
 ```
 ### LCD Display
-LED matrices and seven-segment displays are very useful when we need to display numbers or simple shapes. However, they have an important limitation.  Seven-segment displays are mainly designed for numbers, and LED matrices require a large number of LEDs and complex control if we want to display readable text. To solve this problem, we use **LCD displays (Liquid Crystal Displays)**. These displays allow us to show **text characters and sometimes small symbols**, making them ideal for building user interfaces.
+LED matrices and seven-segment displays are very useful when we need to display numbers or simple shapes. However, they have an important limitation. Seven-segment displays are mainly designed for numbers, and LED matrices require a large number of LEDs and complex control if we want to display readable text. To solve this problem, we use LCD displays (Liquid Crystal Displays). These displays allow us to show text characters and sometimes small symbols, making them ideal for building user interfaces.
 
 An LCD (Liquid Crystal Display) works using a special material called **liquid crystals**. These materials have properties between a liquid and a solid crystal.
 
@@ -252,45 +252,43 @@ Inside the LCD module, there are several layers:
 1. Two polarizing filters
 2. A layer of liquid crystals
 3. Glass plates with transparent electrodes
-4. A backligh
+4. A backlight
 
-<img src="./attachments/LCD.png" />
+<img src="./attachments/LCD.png" height="350px"/>
 
-Unlike LED displays, **LCD pixels do not emit light themselves**. Instead, they act as tiny shutters that control how light passes through the screen.When the internal controller applies a voltage to specific pixel areas, the liquid crystals physically **twist**. This twisting changes the polarization of the light. While light passes through the crystals naturally when no electricity is applied (making the screen look blank and glowing), the twisted crystals cause the second (front) polarizing filter to **block the light**. As a result, the pixel appears **dark**, while the surrounding areas remain bright. This blocked light creates the dark "pixels" that form our letters, numbers, and symbols against the bright background.
+Unlike LED displays, LCD pixels do not emit light themselves. Instead, they act as tiny shutters that control how light passes through the screen.When the internal controller applies a voltage to specific pixel areas, the liquid crystals physically twist. This twisting changes the polarization of the light. While light passes through the crystals naturally when no electricity is applied, the twisted crystals cause the second (front) polarizing filter to block the light. As a result, the pixel appears dark, while the surrounding areas remain bright. This blocked light creates the dark "pixels" that form our letters, numbers, and symbols.       
 
 There is multiple modules of LCD but the most common modules available in the market are:
-- **16 × 2 LCD** Displays 16 characters per row and 2 rows.
-- **20 × 4 LCD** Displays 20 characters per row and 4 rows.
-- **40 × 2 LCD** Displays 40 characters per row and 2 rows.
-- **40 × 4 LCD** Displays 40 characters per row and 4 rows.
+- **16 × 2 LCD** Displays 16 characters per row and 2 rows.
+- **20 × 4 LCD** Displays 20 characters per row and 4 rows.
+- **40 × 2 LCD** Displays 40 characters per row and 2 rows.
+- **40 × 4 LCD** Displays 40 characters per row and 4 rows.
 
-A standard character LCD module typically has 16 pins. These pins are used for power, control signals, data communication, and backlight control, To communicate with the LCD directly, we have two possible modes for sending data from the Arduino:
+A standard 16 × 2 LCD module typically has 16 pins. These pins are used for power, control signals, data communication, and backlight control. 
+
+<img src="./attachments/lcd_pins.png" height="350px" />
+
+To communicate with the LCD directly, we have two possible modes:
 - 8-bit mode
 - 4-bit mode
 
-<img src="./attachments/lcd_pins.png" />
-
-In 8-bit mode, the Arduino uses all eight data pins (D0–D7) of the LCD to send one full byte of data at a time. This method is faster because the entire character is transmitted in a single operation.
-
-However, this mode requires many Arduino pins:
+In 8-bit mode, we uses all eight data pins (D0–D7) of the LCD to send one full byte of data at a time. This method is faster because the entire character is transmitted in a single operation. However, this mode requires many GPIO pins:
 - 8 pins for data
-- 3 control pins (RS, RW, Enable)
+- 2 control pins (RS, Enable)
 
-This means a total of 11 pins, which is a large portion of the available pins on most Arduino boards. Because of this, 8-bit mode is rarely used in simple projects.  
-
-In 4-bit mode, the LCD receives data in two steps instead of one.  First, the Arduino sends the higher 4 bits, then it sends the lower 4 bits of the same byte. The LCD internally combines these two parts to reconstruct the full 8-bit value.  
+In 4-bit mode, the LCD receives data in two steps instead of one. First, we sends the higher 4 bits, then we sends the lower 4 bits of the same byte. The LCD internally combines these two parts to reconstruct the full 8-bit value.  
 This approach reduces the number of required pins:
 - 4 data pins (D4–D7)
 - 2 control pins (RS and Enable)
 
 
-The RW pin is usually connected to GND, meaning the Arduino only writes to the display. As a result, we only need 6 Arduino pins, which makes this mode much more practical, and therefore it is the most commonly used configuration.
+Let’s create a simple “Hello World” example using a 16×2 LCD in 4-bit mode. First, connect the LCD to the Arduino: connect RS to pin 12, EN to pin 11, D4 to pin 5, D5 to pin 4, D6 to pin 3, and D7 to pin 2. For power connections, connect VSS, RW, and K to GND, and VDD and A to 5V. 
 
-Let’s create a simple “Hello World” example using a 16×2 LCD in 4-bit mode. First, connect the LCD to the Arduino: connect RS to pin 12, EN to pin 11, D4 to pin 5, D5 to pin 4, D6 to pin 3, and D7 to pin 2. For power connections, connect VSS, RW, and K to GND, and VDD and A to 5V. The V0 pin, which controls the contrast, is usually connected to the middle pin of a potentiometer placed between 5V and GND so the text visibility can be adjusted.
+<img src="./attachments/circuit_lcd.png" height="350px"/>
 
-<img src="./attachments/circuit_lcd.png" />
+We can program and configure the LCD directly using its datasheet, but this requires sending many low-level commands and managing precise timing, which makes the process complex. Arduino simplifies this by providing the **`LiquidCrystal`** library, which already handles the low-level communication with the display. 
 
-We can program and configure the LCD directly using its **datasheet**, but this requires sending many low-level commands and managing precise timing, which makes the process complex. Arduino simplifies this by providing the **`LiquidCrystal`** library, which already handles the low-level communication with the display. To use it, we first include **`LiquidCrystal.h`**, then create an LCD object and specify the pins connected to the display. In the **`setup()`** function we initialize the LCD by defining the number of **columns and rows**, and inside the **`loop()`** function we can use **`print()`** to display text on the screen.
+To use it, we first include **`LiquidCrystal.h`**, then create an LCD object and specify the pins connected to the display. In the **`setup()`** function we initialize the LCD by defining the number of **columns and rows**, and inside the **`loop()`** function we can use **`print()`** to display text on the screen.
 ```cpp
 #include <LiquidCrystal.h>
 
@@ -315,33 +313,35 @@ The library also provides many additional functions that make it easier to contr
 - **`lcd.noBlink()`** – Stops the cursor from blinking.
 - **`lcd.scrollDisplayLeft()`** – Scrolls the entire display one position to the left.
 
+#### LCD with I2C module
 Everything works well with this setup, but there is one small drawback: the LCD requires six Arduino pins to operate. Using so many pins can limit the number of other devices or sensors we can connect to the Arduino.
 
 To solve this problem, we can use an I2C module attached to the LCD. This module acts as an interface that converts the I2C communication protocol into the parallel signals required by the LCD. With this module, the number of pins needed is reduced to only two communication pins: SDA (data) and SCL (clock). 
 
-Let’s now use the I2C interface to build the same project. First, we build the circuit. We start by connecting the GND and VCC pins of the I2C LCD module to the GND and 5V pins of the Arduino to power the display. After that, we connect the SDA pin of the module to the SDA pin of the Arduino (A4 on Arduino Uno), and the SCL pin to the SCL pin (A5 on Arduino Uno). With these four connections, the LCD can communicate with the Arduino using the I2C protocol.
+Let’s now use the I2C interface to build the same project. First, we build the circuit. We start by connecting the GND and VCC pins of the I2C LCD module to the GND and 5V pins of the Arduino, After that, we connect the SDA pin of the module to the SDA pin of the Arduino (A4 on Arduino Uno), and the SCL pin to the SCL pin (A5 on Arduino Uno).
 
-<img src="./attachments/lcd_i2c.png" />
+<img src="./attachments/lcd_i2c.png" height="300px"/>
 
-Now we can control the LCD using the **`LiquidCrystal_I2C.h`** library. First, we include the library in our program. After that, we create an LCD object where we specify the **I2C address**, along with the **number of columns and rows** of the display. The address identifies the LCD module on the I2C bus (commonly **0x27** or **0x3F** depending on the module).
-
-Inside the **`setup()`** function, we initialize the LCD using `lcd.init()` and turn on the backlight using `lcd.backlight()`. Finally, in the **`loop()`** function, we can display text on the screen using the `print()` function.
-```cpp
+Now we can control the LCD using the **`LiquidCrystal_I2C.h`** library. First, we include the library in our program. After that, we create an LCD object where we specify the I2C address, along with the number of columns and rows of the display. The address identifies the LCD module on the I2C bus it is commonly **0x27** or **0x3F** depending on the module.
+```
 #include <LiquidCrystal_I2C.h>  
   
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Address, columns, rows  
-  
+```
+Inside the **`setup()`** function, we initialize the LCD using `lcd.init()` and turn on the backlight using `lcd.backlight()`.
+```cpp
 void setup() {  
 lcd.init();  
 lcd.backlight();  
 lcd.print("Hello, World!");  
 }  
-  
+```
+Finally, in the **`loop()`** function, we can display text on the screen using the `print()` function.
+```
 void loop() {  
 lcd.print("Hello, World!");  
 }
 ```
-
 For larger sizes like 40x2 or 40x4, we use similar setup but specify dimensions in begin
 ```cpp
 LiquidCrystal_I2C lcd(0x27, 40, 2); // 40×2 LCD  
@@ -360,6 +360,7 @@ The **`LiquidCrystal_I2C`** library comes with many additional functions that ma
 - **`lcd.scrollDisplayLeft()`** Scrolls the entire display one position to the left.
 - **`lcd.scrollDisplayRight()`** Scrolls the display one position to the right.
 - **`lcd.createChar(location, charmap)`** Allows creating custom characters or symbols (up to 8 custom characters).
+
 ## Connectivity and Communication
 We used different sensors and display devices with an Arduino Uno board. However, in large projects we may need many devices, which can exceed the number of available pins on a single Arduino board.  
 To solve this problem, we can use networking techniques. By connecting multiple Arduino boards together, we can expand the number of available pins and distribute tasks among several boards. In addition, networking allows different devices in the system to communicate with each other and exchange data, making the overall system more efficient and scalable for complex projects.
