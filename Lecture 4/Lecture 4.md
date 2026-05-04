@@ -3,68 +3,64 @@
 - Connectivity and Communication in Arduino
 
 ## Display Devices
-When working with Arduino, we often need a way to see what is happening inside our program.   
-This is where display devices come in. Display devices are essential output components that allow the Arduino to communicate directly with the external world. They help us get information, display sensor data, show alerts, or create user interfaces. Instead of just turning on a single LED to indicate a state, displays allow us to show numbers, text, and even complex graphics.
+When working on embedded system projects, we often need a way to see what is happening inside our microcontroller.
+This is where display devices come in. Display devices are essential output components that allow the microcontroller to communicate directly with the external world. They help us retrieve information, display sensor data, show alerts, and create user interfaces. Instead of just turning on a single LED to indicate a state, displays allow us to show numbers, text, and even complex graphics.
 ### LED Matrix
-The simplest display device is LED matrix, it is a 2D array of LEDs arranged in rows and columns. The most common size used with Arduino is the 8x8 LED matrix, which contains 64 individual LEDs packed into a single module.   
-If we tried to control 64 LEDs individually, we would need 64 digital pins, which the Arduino does not have. To solve this, the LEDs are wired using a technique called multiplexing. The anodes (positive sides) of the LEDs in each row are connected together, and the cathodes (negative sides) in each column are connected together. By rapidly turning specific rows and columns ON and OFF one at a time, our eyes are tricked into seeing a continuous image or pattern.
+The simplest display device is LED matrix, it is a 2D array of LEDs arranged in rows and columns. The most common size is the 8x8 LED matrix, which contains 64 individual LEDs packed into a single module.
+If we tried to control 64 LEDs individually, we would need 64 digital pins, which most microcontroller does not have. To solve this, the LEDs are wired using a technique called multiplexing. The anodes (positive sides) of the LEDs in each row are connected together, and the cathodes (negative sides) in each column are connected together.
 
-<img src="./attachments/8_led_matrix.png" />
+<img src="./attachments/8_led_matrix.png" height="300px"/>
 
-From the diagram, we can see that a simple 8 × 8 LED matrix would normally require 16 pins to control it (8 rows and 8 columns).  For example, sending a high signal to column 1 will activate that column. 
+From the diagram, we can see that a simple 8 × 8 LED matrix would normally require 16 pins to control it (8 rows and 8 columns). For example, sending a high signal to column 1 will activate that column.
 
-<img src="./attachments/column.png" />
+<img src="./attachments/column.png" height="300px" />
 
-Then, by controlling the rows, we can decide which LEDs in that column turn on or off. Suppose we want to turn on only the first two LEDs in column 1. In that case, we would send a high voltage to column 1 and, to select the rows signals we send High signal to all rows except the first and second one so only  those two LEDs are active, while the others remain off.
+Then, by controlling the rows, we can decide which LEDs in that column turn on or off. Suppose we want to turn on only the first two LEDs in column 1. In that case, we would send a high voltage to column 1 and, to select the rows signals we send High signal to all rows except the first and second one so only those two LEDs are active, while the others remain off.
 
-<img src="./attachments/2led_8_8.png" />
+<img src="./attachments/2led_8_8.png" height="300px" />
 
-However, when we try to draw more complex shapes, we may encounter a problem. Some parts of the drawing may require certain rows or columns to be on and off at the same time, which is not possible in a simple matrix control scheme. As a result, the displayed image may appear incomplete or incorrect.  
-To solve this issue, we can split the drawing into multiple frames. For example, to draw a smiling face, the first frame could display the eyes, and the second frame could display the mouth. By switching very quickly between these frames, we create the illusion that both parts are displayed simultaneously. Because of the persistence of vision, the observer perceives the full smiling face instead of separate images.
+However, when we try to draw more complex shapes, we may encounter a problem. We might run into conflicts where turning on specific LEDs causes other unwanted LEDs to light up. As a result, the displayed image may appear incomplete or incorrect. To solve this issue, we can split the drawing into multiple frames. For example, to draw a smiling face, the first frame could display the eyes, and the second frame could display the mouth. By switching very quickly between these frames, we create the illusion that both parts are displayed simultaneously. Because of the persistence of vision, the observer perceives the full smiling face instead of separate images.
 
-<img src="./attachments/smile_face.png" />
-
-
-Using all 16 pins  would consume most of the available pins on an Arduino, to simplify working with an LED matrix, modules are often paired with a driver chip such as the MAX7219. This chip handles all the multiplexing internally, so we don't need to control each LED individually. As a result, we will need only three digital pins Data, Clock, and Load (CS).
-
-The MAX7219 works by receiving commands serially in 16-bit packets. Inside the chip, there's a 16-bit shift register that collects these bits, an 8×8 memory (like SRAM) to store which LEDs should be on, and built-in multiplexing logic that rapidly scans the rows (or digits) to make the whole display look steadily lit through persistence of vision.
-
-- **Data pin (DIN)**: This is where the actual information flows in. The Arduino sends one bit at a time (0 or 1) for example, the first 8 bits might be the register address, and the next 8 bits are the value or pattern..
-- **Clock pin (CLK)**: This provides the timing. On each rising edge of the clock signal, the MAX7219 samples and shifts in one bit from the DIN line into its internal shift register. Without proper clock pulses synchronized with the data, nothing gets loaded correctly.
-- **CS / LOAD pin**: This acts as the "latch" or chip select signal (active low). While CS is held **low**, the chip listens and shifts in bits with every CLK pulse. After exactly 16 clock pulses (16 bits sent), the Arduino pulls CS high this rising edge tells the MAX7219 "ok, the full command is ready now decode it and apply it to the display or registers."
-
-In short, to communicate with the MAX7219, the Arduino first pulls CS (Chip Select) low to indicate that data transmission is starting. Then, for 16 clock cycles, the Arduino sets the desired bit on the DIN (Data) pin and pulses the CLK (Clock) pin high and then low. Each clock pulse sends one bit to the chip.  After the 16th clock pulse, the Arduino pulls CS high. The MAX7219 then latches the 16 bits, interprets them as an address and data, and updates the display memory or configuration settings such as brightness or scan limit. Once this is done, the MAX7219 automatically handles the continuous row-by-row scanning of the LED matrix, so the Arduino does not need to refresh the display unless the data changes.
+<img src="./attachments/smile_face.png"  eight="300px" />
 
 
-Manually setting and configuring all this ourselves timing the bits, generating 16 precise CLK pulses per command, managing CS edges, sending init sequences like turning off shutdown mode, setting scan limit to 8 rows, choosing no-decode mode for matrix control, etc. would be a hard and error-prone task.
+Following this method we can draw most of the shape we want but there is small problem using all 16 pins would consume most of the available pins on our microcontroller, to simplify working with an LED matrix, we use a driver chips such as the MAX7219. This chip handles all the multiplexing internally, so we don't need to control each LED individually. As a result, we will need only three digital pins Data, Clock, and Load (CS).
+#### MAX7219
+The MAX7219 driver helps us control an LED matrix while reducing the number of control pins to only three. To manage all the LEDs, it contains an internal 8×8 memory (similar to SRAM) that stores which LEDs should be on. Its internal circuitry then translates this data and applies it to the LED matrix. We communicate with this driver using SPI communication, where the data flow is controlled using three pins:
 
-Arduino simplifies this enormously by providing libraries such as LedControl, MD_MAX72XX, or MD_Parola these handle all the complex low-level configuration, timing, bit-shifting, and command formatting for us. 
+- **Data pin (DIN)**: This is where the actual information flows in. We send one bit at a time. The first 8 bits represent the register address, and the next 8 bits represent the value or pattern.
+- **Clock pin (CLK)**: This provides the timing. On each rising edge of the clock signal, the MAX7219 samples and shifts in one bit from the DIN line into its internal shift register.
+- **CS / LOAD pin**: This acts as the latch or chip select signal (active low). While CS is held **low**, the chip listens and shifts in bits with every CLK pulse. After exactly 16 clock pulses (16 bits sent), we pull CS high. This rising edge tells the MAX7219, “OK, the full command is ready now decode it and apply it to the display or registers.”
+
+In short, to communicate with the MAX7219, we first pull CS (Chip Select) low to indicate that data transmission is starting. Then, for 16 clock cycles, we set the desired bit on the DIN (Data) pin and pulse the CLK (Clock) pin high and then low. Each clock pulse sends one bit to the chip. After the 16th clock pulse, we pull CS high. The MAX7219 then latches the 16 bits, interprets them as an address and data, and updates the display memory or configuration settings such as brightness or scan limit. Once this is done, the MAX7219 automatically handles the continuous row-by-row scanning of the LED matrix, Here diagram illustrate the operation.
+
+<img src="./attachments/diagram.png" height="300px"/>
+
+Manually setting and configuring all this ourselves would be a hard and error-prone task, Arduino simplifies this enormously by providing libraries such as ``LedControl``, ``MD_MAX72XX``, or ``MD_Parola`` these handle all the complex low-level configuration for us. 
 
 Let’s create a simple project to display a heart on the LED matrix. First, we need to build the circuit.  
-Start by connecting the **VCC** and GND pins of the Arduino to the VCC and GND pins of the MAX7219 module to power the display.  
+Start by connecting the **VCC** and GND pins of the Arduino to the VCC and GND pins of the MAX7219 module.  
 Next, connect the three control pins between the Arduino and the driver: connect Data (DIN) to pin 13, CLK to pin 11, and CS to pin 12 of the Arduino. These three pins will handle the communication between the Arduino and the MAX7219.
 
 <img src="./attachments/circuit.png" />
 
-Now let’s create our program to control the MAX7219. We will use the **LedControl** library to simplify communication with the driver.
-First, we include the library in our program. After that, we create an object of the LedControl class. In the constructor, we pass the pins used for communication: 13 for DIN (Data), 11 for CLK (Clock), and 12 for CS (Chip Select). We also specify the number of LED matrices connected, which in this case is **1**.   
-Inside the `setup()` function, we begin by waking up the display (since it starts in power-saving mode). Then we set the brightness level, and finally clear the display so we start with a blank screen.
-
-Next, we define an 8×8 matrix of bits that represents the shape of a heart. Each row of this matrix corresponds to one row of LEDs on the display.
-
-Finally, inside the `loop()` function, we iterate through the rows of this matrix and send each row to the display using the library function, which lights up the LEDs to form the heart pattern on the LED matrix.
-
+Now let’s create our program to control the MAX7219. We will use the **LedControl** library, First, we include the library in our program. After that, we create an object of the LedControl class. In the constructor, we pass the pins used for communication: 13 for DIN (Data), 11 for CLK (Clock), and 12 for CS (Chip Select). We also specify the number of LED matrices connected, which in this case is 1.   
+```
 ```cpp 
 #include <LedControl.h>
 
 LedControl lc = LedControl(13, 11, 12, 1); 
-
+```
+Inside the `setup()` function, we begin by waking up the display. Then we set the brightness level, and finally clear the display so we start with a blank screen.
+```
 void setup() {
   lc.shutdown(0, false); // Wake up the display
   lc.setIntensity(0, 8); // Set brightness level (0 to 15)
   lc.clearDisplay(0);    // Clear the screen
 }
-
+```
+Next, we define an 8×8 matrix of bits that represents the shape of a heart. Each row of this matrix corresponds to one row of LEDs on the display.
+```
 byte heart[8] = { 
 	B00000000, 
 	B01100110, 
@@ -75,6 +71,10 @@ byte heart[8] = {
 	B00111100, 
 	B00011000 
 };
+```
+Finally, inside the `loop()` function, we iterate through the rows of this matrix and send each row to the display using the library function, which lights up the LEDs to form the heart pattern on the LED matrix.
+
+```cpp 
 void loop() {
 	for (int row = 0; row < 8; row++) {
 		lc.setRow(0, row, heart[row]); 
@@ -86,7 +86,7 @@ The library provide us additional function to work with the matrix led for examp
 - ``lc.setLed(0, row, col, state)`` to light individual pixels
 - ``lc.setColumn(0, col, value)`` to control by column instead of row
 
-If we want to use more than one LED matrix (for example 16×8, 24×8, or 32×8 displays), we connect several MAX7219 modules in series. In this case, we must change the configuration when creating the `LedControl` object.   
+If we want to use more than one LED matrix for example 16×8, 24×8, or 32×8 displays, we connect several MAX7219 modules in series. In this case, we must change the configuration when creating the `LedControl` object.   
 When we create the object, the last parameter specifies the number of devices (matrices) connected.
 ```cpp 
 LedControl lc = LedControl(13, 11, 12, 2); // for two matrices (16×8)
