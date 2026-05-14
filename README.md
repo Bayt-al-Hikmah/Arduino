@@ -108,7 +108,7 @@ Covers the main display technologies used with Arduino.
 - 7-segment display common cathode/anode, multiplexing
 - LCD 16×2 parallel wiring and I²C backpack (`LiquidCrystal_I2C`)
 
-#### Communication Protocols & Wireless
+### Communication Protocols & Wireless
 Works through each serial communication protocol, including wireless modules.
 
 **Communication Protocols**
