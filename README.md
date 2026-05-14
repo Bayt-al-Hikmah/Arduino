@@ -99,7 +99,7 @@ Covers reading and driving digital and analogue pins, generating PWM signals, an
 - Stepper motors full-step and half-step modes, `Stepper.h`
 - Brushless DC motors ESC calibration and control via PWM
 
-### Lecture 4 Displays, 
+### Lecture 4 Displays 
 Covers the main display technologies used with Arduino.
 **Topics covered:**
 
@@ -108,7 +108,7 @@ Covers the main display technologies used with Arduino.
 - 7-segment display common cathode/anode, multiplexing
 - LCD 16×2 parallel wiring and I²C backpack (`LiquidCrystal_I2C`)
 
-### Communication Protocols & Wireless
+### Lecture 5 Communication Protocols & Wireless
 Works through each serial communication protocol, including wireless modules.
 
 **Communication Protocols**
