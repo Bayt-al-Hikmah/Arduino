@@ -2,7 +2,7 @@
 
 This course provides a structured introduction to Arduino programming, and microcontroller development. It is designed for beginners who want to understand both the theoretical foundations of electronics and the practical use of Arduino for embedded systems projects.
 
-The course is divided into 5 lectures, progressing from basic electrical concepts to low-level microcontroller programming.
+The course is divided into 6 lectures, progressing from basic electrical concepts to low-level microcontroller programming.
 
 ![Lectures](https://img.shields.io/badge/Lectures-5-00c896?style=flat-square)
 ![Board](https://img.shields.io/badge/Board-Arduino%20UNO-ff6b35?style=flat-square)
@@ -19,8 +19,9 @@ The course is divided into 5 lectures, progressing from basic electrical concept
   - [Lecture 1 Foundations](#lecture-1--foundations--electricity-electronics--microcontrollers)
   - [Lecture 2 Arduino Basics](#lecture-2--arduino-platform--setup-ide--programming-basics)
   - [Lecture 3 GPIO & Motors](#lecture-3--gpio-sensors-actuators--motors)
-  - [Lecture 4 Displays & Communication](#lecture-4--displays-communication-protocols--wireless)
-  - [Lecture 5 Low-Level Programming](#lecture-5--atmega328p-low-level-programming--register-configuration)
+  - [Lecture 4 Displays](#lecture-4--displays-devices)
+  - [Lecture 5 Communication](#lecture-5--communication-protocols--wireless)
+  - [Lecture 6 Low-Level Programming](#lecture-6--atmega328p-low-level-programming--register-configuration)
 - [Prerequisites](#-prerequisites)
 - [Learning Path](#-learning-path)
 
@@ -98,15 +99,17 @@ Covers reading and driving digital and analogue pins, generating PWM signals, an
 - Stepper motors full-step and half-step modes, `Stepper.h`
 - Brushless DC motors ESC calibration and control via PWM
 
-### Lecture 4 Displays, Communication Protocols & Wireless
-Covers the main display technologies used with Arduino, then systematically works through each serial communication protocol, including wireless modules.
-
+### Lecture 4 Displays, 
+Covers the main display technologies used with Arduino.
 **Topics covered:**
 
 **Display Devices**
 - LED dot matrix MAX7219 driver, `LedControl` library
 - 7-segment display common cathode/anode, multiplexing
 - LCD 16×2 parallel wiring and I²C backpack (`LiquidCrystal_I2C`)
+
+#### Communication Protocols & Wireless
+Works through each serial communication protocol, including wireless modules.
 
 **Communication Protocols**
 
@@ -120,7 +123,7 @@ Covers the main display technologies used with Arduino, then systematically work
 - HC-05 Bluetooth module AT commands, pairing, UART bridge
 - ESP8266 Wi-Fi module AT firmware, connecting to a network, HTTP requests
 
-### Lecture 5 ATmega328P Low-Level Programming & Register Configuration
+### Lecture 6 ATmega328P Low-Level Programming & Register Configuration
 This lecture leaves the Arduino library behind and programs the ATmega328P using memory-mapped registers the same way professional embedded firmware is written.
 
 **Topics covered:**
@@ -170,8 +173,9 @@ Each lecture builds directly on the one before it.
 **Lecture 1** gives you the physics intuition that makes electronics make sense.  
 **Lecture 2** grounds that theory in a real board and a working development environment.   
 **Lecture 3** puts I/O at the centre reading the physical world and driving real actuators.   
-**Lecture 4** expands your toolkit to displays and multi-device serial communication.    
-**Lecture 5** closes the loop you learn what the Arduino library has been doing for you all along, then write it yourself.    
+**Lecture 4** expands your toolkit to displays.    
+**Lecture 5** Introduce serial and wireless communication.    
+**Lecture 6** closes the loop you learn what the Arduino library has been doing for you all along, then write it yourself.    
 
 
 *© 2026  All rights reserved*
