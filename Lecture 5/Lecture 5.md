@@ -1,843 +1,774 @@
 ## Objectives
-- Working with ATmega328P
-- Functional Programming
+- Exploring Communication Protocols
+- Wireless Connectivity in Arduino
 
-## ATmega328P
-### Introduction
-Arduino helps simplify working with microcontrollers by providing easy-to-use functions and a user-friendly development environment. However, this simplicity comes at a cost. We lose a certain level of control over the hardware and the microcontroller itself, and our programs may run slower due to the overhead of built-in functions.  
-For example, when reading a button press using standard Arduino functions, we often introduce delays to handle issues like debouncing. These delays can slow down the overall performance of the program.  
-To overcome these limitations, we can program the Arduino at a lower level by bypassing the built-in functions and working directly with the microcontroller. This allows us to achieve faster execution and greater control over the hardware.  
-The first step in doing this is to understand the internal structure of the microcontroller, specifically the ATmega328P, which the Arduino board is built on.
-### ATmega328P Structure
-The ATmega328P is an 8-bit microcontroller, which means it processes data in chunks of 8 bits (1 byte) at a time. In practical terms, this defines how the processor handles arithmetic operations, memory access, and data transfer. For example, when performing calculations or moving data between registers, the microcontroller works most efficiently with 8-bit values. While it can handle larger data types, such as 16-bit or 32-bit values, these require multiple operations.
+## Comunication Protocols 
+We used different sensors and display devices with an Arduino Uno board. However, in large projects we may need many devices, which can exceed the number of available pins on a single Arduino board.  
+To solve this problem, we can use networking techniques. By connecting multiple Arduino boards together, we can expand the number of available pins and distribute tasks among several boards. In addition, networking allows different devices in the system to communicate with each other and exchange data, making the overall system more efficient and scalable for complex projects.
+### Serial Communication
+Serial communication is one of the most common ways for an Arduino board to communicate with a computer or with other devices. It is a method of transmitting data sequentially, bit by bit, over a communication channel.   
+When we program our Arduino, we use serial communication. By plugging in the USB cable, a serial communication link is established between the Arduino board and the computer. Through this connection, we can upload our program to the microcontroller.
 
-The ATmega328P comes in a package with multiple pins (28 pins in the common DIP version), and each pin has a specific function. Some pins are used for power supply (VCC, GND), others for digital input/output, and some provide special functionalities such as analog input, communication lines (UART, SPI, I2C), or clock signals. These pins are the physical interface between the microcontroller and the external world, allowing it to interact with sensors, displays, and other components.
-<img src="./attachments/atmega.png" />
+However, serial communication is not only used for programming. We can also send and receive data between the computer and the Arduino board. This is very useful for debugging programs, because it allows us to display messages or variable values while the program is running.
 
-To fully understand how the microcontroller operates and how we can control it at a low level, we need to explore its main internal components, including the CPU, memory system, registers, and peripherals, and see how each of them contributes to the overall functionality of the microcontroller.
-#### Central Processing Unit
-The **Central Processing Unit (CPU)** is the brain of a computing system. It is an integrated circuit that contains millions of transistors working together to perform mathematical and logical operations using logic gates and Boolean algebra.
+To use serial communication in Arduino programs, we use the Serial library, which provides functions for sending and receiving data.
 
-The CPU used in the ATmega32 is based on an 8-bit AVR RISC (Reduced Instruction Set Computer) architecture. This architecture uses a small set of simple instructions that can be executed very quickly. Most instructions are completed in a single clock cycle, which increases processing efficiency.
-
-The main components of the CPU are:
-- **Arithmetic Logic Unit (ALU)** Performs arithmetic operations such as addition and subtraction, and logical operations such as AND, OR, NOT, and XOR.
-- **Register File** The CPU contains **32 general-purpose 8-bit registers** that are directly connected to the ALU. These registers allow fast data access and enable many instructions to execute in a single clock cycle.
-- **Program Counter (PC)**  Stores the address of the next instruction to be fetched and executed from the program memory.
-- **Instruction Register and Instruction Decoder**  The instruction register holds the current instruction, while the decoder interprets it and generates the control signals required for execution.
-- **Stack Pointer (SP)** Points to the top of the stack in memory and is used during function calls, interrupts, and return operations.
-- **Status Register (SREG)** Contains several flags that indicate the result of ALU operations, such as Zero (Z), Carry (C), Negative (N), and Overflow (V).
-- **Clock Unit**  Provides the timing signal that synchronizes all CPU operations and determines the speed at which instructions are executed.
-
-
-<img src="./attachments/cpu_archetecture.png" />
-
-#### Memory
-Memory is an essential component in a computing system used to store instructions and data required for program execution. It is built from electronic circuits composed of logic gates and flip-flops, which use sequential logic to store information. Data in memory is represented using binary values (Boolean representation), where electrical signals correspond to logical states: 1 represents the presence of a signal (high voltage) and 0 represents the absence of a signal (low voltage).  
-The ATmega328P uses a Harvard architecture, meaning that program memory and data memory are separated. This architecture allows the CPU to access instructions and data simultaneously, which improves overall system performance and execution speed.    
-The memory system consists of several types of memory, each designed for a specific purpose.
-- **Flash Memory (Program Memory)** Flash memory is used to store the program instructions that the CPU executes. It is non-volatile, meaning the stored program remains even when power is removed. The ATmega328P contains 32 KB of Flash memory used for storing firmware or application code.
-- **SRAM (Static Random Access Memory)** SRAM is used to store temporary data during program execution. It holds variables, the stack, and intermediate data used by the CPU. Unlike Flash, SRAM is volatile, meaning its contents are lost when the power is turned off. The ATmega328P provides 2 KB of SRAM.
-- **EEPROM (Electrically Erasable Programmable Read-Only Memory)** EEPROM is a non-volatile data memory used to store data that must be preserved even when the device is powered off. It is typically used for storing configuration parameters or calibration data, Unlike Flash, it can be modified during runtime. The ATmega328P includes 1 KB of EEPROM.
-
-<img src="./attachments/havard.png" />
-
-#### Registers
-Registers are small, high-speed storage elements located within the microcontroller and used to hold data temporarily during program execution. They are implemented using flip-flops and sequential logic circuits, allowing them to store binary values that can be accessed extremely quickly by the processor.
-
-In the **ATmega328P**, registers play a critical role in controlling both the CPU operations and the internal peripherals of the microcontroller. Some registers are **CPU registers**, meaning they are directly used by the processor core during instruction execution such as the **General Purpose Registers (R0–R31)**, the **Status Register (SREG)**, and the **Stack Pointer registers (SPH and SPL)** . Others are **peripheral registers**, which are used to configure and control hardware modules such as timers, communication interfaces, and analog converters.
-
-The register system in the ATmega328P can therefore be divided into two main categories:
-
-- **CPU Registers** directly used by the processor core (e.g., General Purpose Registers, Status Register, and Stack Pointer).
-- **Peripheral / I/O Registers** used to configure and control hardware modules like GPIO, timers, ADC, and communication interfaces.
-
-Each group of registers has a specific role in the operation of the microcontroller.
-
-#### General Purpose Registers
-The **ATmega328P** contains 32 general-purpose 8-bit registers R0 – R31, These registers are directly connected to the Arithmetic Logic Unit (ALU), allowing arithmetic and logical operations to be executed very quickly, Each register stores 8 bits of data, they are used to store operands, intermediate results, and temporary data  
-Because these registers are inside the CPU core, they are considered CPU registers and provide the fastest data access available in the system.   
-Some of these registers can also be combined to form 16-bit pointer registers, which are used for indirect addressing.
-
-|Register Pair|Pointer Name|Purpose|
-|---|---|---|
-|R27:R26|**X Register**|Indirect SRAM addressing|
-|R29:R28|**Y Register**|Indirect addressing with displacement|
-|R31:R30|**Z Register**|Indirect addressing and program memory access|
-These pointer registers allow the CPU to efficiently access data stored in memory.
-#### Status Register (SREG) 
-The Status Register (SREG) is a special CPU register that stores status flags generated by the ALU after arithmetic and logical operations.
-Each bit in this register represents a flag describe properties of the result. These flags are used by the CPU to make decisions during conditional branching and program control.
-
-|Bit|Name|Meaning|
-|---|---|---|
-|7|I|Global Interrupt Enable|
-|6|T|Bit Copy Storage|
-|5|H|Half Carry|
-|4|S|Sign Bit|
-|3|V|Overflow|
-|2|N|Negative|
-|1|Z|Zero|
-|0|C|Carry|
-
-For example, if an arithmetic operation produces a result equal to zero, the Zero (Z) flag is set, allowing the program to perform conditional jumps based on that result.
-
-#### Stack Pointer Registers 
-The Stack Pointer (SP) is a special register inside the CPU that manages the stack, which is a dedicated area of SRAM used for temporary data storage while a program is running. The stack works like a pile of items: data can be placed on top of the stack or removed from the top of the stack. The stack pointer always holds the memory address of the current top of the stack, allowing the CPU to know where the next value should be stored or retrieved.
-
-In the ATmega328P, the stack pointer is 16 bits. Since the CPU registers are 8 bits wide, the stack pointer is implemented using two separate registers. 
-
-|Register|Description|
-|---|---|
-|**SPH**|Stack Pointer High byte|
-|**SPL**|Stack Pointer Low byte|
-
-The stack commonly used during function calls, where the CPU saves the Program Counter (PC) value on the stack. This value is the address of the next instruction in the program, allowing the CPU to return to the correct place after the function finishes.   
-The stack is also used during interrupts. When an interrupt occurs, the CPU automatically saves the Program Counter (PC) on the stack before jumping to the interrupt service routine (ISR). This allows the CPU to resume the interrupted program at the correct instruction after the interrupt routine completes.    
-When data is pushed onto the stack, the Stack Pointer (SP) automatically updates to point to the new top of the stack. When data is popped, the Stack Pointer moves back to the next value below it. This allows the CPU to manage temporary data automatically during program execution.
-#### Timer/Counter Registers 
-The Timer/Counter in the ATmega328P is a special hardware module inside the CPU used to measure time, count events, or generate precise delays. It works like a small clock that can increment a number automatically based on the system clock or external signals. The value of this counter is stored in Timer/Counter registers, which the CPU can read or write to control timing operations.   
-There are three main timers in the ATmega328P: Timer0, Timer1, and Timer2. Each timer has its own set of registers, which usually include:
-
-|Register|Description|
-|---|---|
-|**TCNTx**|Timer/Counter register that holds the current count value of the timer (x = 0, 1, 2)|
-|**TCCRnA / TCCRnB**|Timer/Counter Control Registers that configure how the timer works (mode, clock source, prescaler)|
-|**OCRnx**|Output Compare Registers used to compare the timer value and trigger actions like toggling pins or generating interrupts|
-|**TIMSKn**|Timer Interrupt Mask Register used to enable or disable specific timer interrupts|
-|**TIFRn**|Timer Interrupt Flag Register that indicates when a timer event, such as overflow or compare match, has occurred|
-
-The Timer/Counter is commonly used for delays, generating PWM signals, or counting external events. For example, the CPU can set the TCNTx register to zero, configure a prescaler in TCCRnB, and wait for the timer to reach a specific value in OCRnx. When the timer reaches this value, an interrupt can be triggered, or a pin can toggle automatically.
-
-Whenever the timer counts, the TCNTx register automatically updates with each clock pulse. This allows the CPU to track time or events precisely without constantly checking the counter. Interrupt flags in TIFRn are set automatically when the timer reaches certain conditions, signaling the CPU to execute the corresponding interrupt routine.
-#### I/O Registers
-The **I/O Registers** in the ATmega328P are special memory locations inside the CPU used to control and interact with the microcontroller’s hardware, They are mostly used to control and read the digital pins of the microcontroller.
-The ATmega328P has three main I/O ports: PORTB, PORTC, and PORTD. Together, these ports provide a total of 23 general-purpose digital I/O pins. Each port has three associated registers:
-
-| Register  | Description                                                                                        |
-| --------- | -------------------------------------------------------------------------------------------------- |
-| **PORTx** | Controls the output value of digital pins. Writing `1` sets the pin high, writing `0` sets it low. |
-| **DDRx**  | Data Direction Register determines whether a pin is configured as an **input** or **output**.      |
-| **PINx**  | Reads the current state of digital pins. It shows whether a pin is high or low.                    |
-
-- **PORTB** has 8 pins: PB0 – PB7
-- **PORTC** has 7 pins: PC0 – PC6
-- **PORTD** has 8 pins: PD0 – PD7
-
-
-<img src="./attachments/io_registers.png" />
-
-For example, to make PB5 an output and turn it high, the CPU sets the corresponding bit in DDRB to `1` and sets the bit in PORTB to `1`. To read whether PD2 is high or low, the CPU reads the PINx register for PORTD.
-#### ADC Registers
-The Analog-to-Digital Converter (ADC) in the ATmega328P is a module that allows the CPU to read analog voltages from sensors or other devices and convert them into digital numbers the CPU can process. The ADC uses special ADC registers to control its operation, select the input channel, start conversions, and read the results.    
-The main ADC registers in the ATmega328P are:
-
-| Register        | Description                                                                                                                                  |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ADMUX**       | ADC Multiplexer Selection Register selects which analog input pin to read and sets the reference voltage for conversion                      |
-| **ADCSRA**      | ADC Control and Status Register A controls starting the conversion, enabling/disabling the ADC, and setting the conversion speed (prescaler) |
-| **ADCSRB**      | ADC Control and Status Register B used for advanced features like trigger sources for automatic conversions                                  |
-| **ADCL / ADCH** | ADC Data Registers store the 10-bit digital result of the conversion. ADCL contains the lower 8 bits, ADCH contains the upper 2 bits         |
-| **DIDR0**       | Digital Input Disable Register disables the digital input buffers on specific analog pins to reduce power consumption and noise              |
-
-The ATmega328P has 6 dedicated analog input pins: ADC0 – ADC5 (on PORTC). Each pin can measure a voltage between 0V and the reference voltage (usually 5V).  
-To use the ADC, the CPU we selects an input channel in ADMUX, enables the ADC in ADCSRA, and starts a conversion. When the conversion is complete, the 10-bit result is stored in ADCL and ADCH, which the CPU can read to get the digital value corresponding to the analog voltage.   
-The ADC registers allow the CPU to read sensors like temperature sensors, light sensors, or potentiometers efficiently, converting real-world analog signals into digital numbers the program can use.
-#### USART Registers
-The USART (Universal Synchronous and Asynchronous Receiver and Transmitter) used for serial communication. It allows the microcontroller to send and receive data one bit at a time over communication lines. This is commonly used to communicate with devices such as computers, sensors, or other microcontrollers.   
-The USART module uses several registers to configure communication settings, send data, and receive data.
-
-| Register            | Description                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **UCSR0A**          | USART Control and Status Register A – contains status flags such as transmission complete and data received         |
-| **UCSR0B**          | USART Control and Status Register B – enables or disables the transmitter, receiver, and USART interrupts           |
-| **UCSR0C**          | USART Control and Status Register C – configures the communication format, such as data bits, parity, and stop bits |
-| **UBRR0H / UBRR0L** | USART Baud Rate Registers – set the communication speed (baud rate)                                                 |
-| **UDR0**            | USART Data Register – holds the data byte to be transmitted or the byte that was received                           |
-
-To **send data**, the CPU writes a byte to the UDR0 register. The USART hardware then transmits the data serially through the TX pin.  
-To receive data, the USART hardware stores the received byte in **UDR0**, and the CPU reads this register to obtain the data.
-
-The baud rate of the communication is configured using UBRR0H and UBRR0L, which determine how fast bits are transmitted. The communication format, such as the number of data bits and stop bits, is configured using UCSR0C.
-The ATmega328P uses two pins for USART communication:
-- **PD0 (RX)** – receives serial data
-- **PD1 (TX)** – transmits serial data
-
-These registers allow the CPU to exchange data with external devices efficiently using serial communication.
-
-#### Interrupt Registers
-Finally The Interrupt Registers in the ATmega328P are used to control and manage interrupts. An interrupt allows the CPU to pause the current program and immediately execute a special function called an Interrupt Service Routine (ISR) when a specific event occurs, such as a timer event, a pin change, or incoming serial data.     
-These registers allow the CPU to enable or disable interrupts and check whether an interrupt event has occurred.   
-The main interrupt-related registers include:
-
-| Register   | Description                                                                                                  |
-| ---------- | ------------------------------------------------------------------------------------------------------------ |
-| **SREG**   | Status Register – contains the **Global Interrupt Enable (I) bit**, which enables or disables all interrupts |
-| **EIMSK**  | External Interrupt Mask Register – enables or disables external interrupts                                   |
-| **EIFR**   | External Interrupt Flag Register – indicates when an external interrupt event has occurred                   |
-| **PCICR**  | Pin Change Interrupt Control Register – enables pin change interrupts for specific ports                     |
-| **PCIFR**  | Pin Change Interrupt Flag Register – indicates when a pin change interrupt has occurred                      |
-| **TIMSKn** | Timer Interrupt Mask Registers – enable or disable timer-related interrupts                                  |
-| **TIFRn**  | Timer Interrupt Flag Registers – indicate when timer interrupt events occur                                  |
-
-The Global Interrupt Enable bit (I) in the SREG register controls whether interrupts are allowed at all. When this bit is set to **1**, interrupts are enabled. When it is **0**, all interrupts are disabled.   
-Each interrupt source also has its own **enable bit** in a mask register such as **EIMSK** or **TIMSKn**. This allows the CPU to enable only the interrupts that the program needs.  
-When a hardware event occurs, the corresponding **interrupt flag** in a flag register (such as **EIFR** or **TIFRn**) is set. If the interrupt is enabled and global interrupts are allowed, the CPU automatically jumps to the corresponding **Interrupt Service Routine (ISR)** to handle the event.
-
-These registers allow the CPU to respond quickly to hardware events without constantly checking device states in the main program.
-### Programming The Atmega328p
-The Arduino IDE and development boards simplify working with the ATmega328P microcontroller. However, this simplification does not come without a cost. The built-in functions and objects hide many low-level details and hardware abstractions. Fortunately, the Arduino IDE also allows us to program the microcontroller more directly. With a solid understanding of the ATmega328P architecture, we can write programs that provide low-level control and direct access to the microcontroller’s registers and peripherals, which can significantly improve the performance and efficiency of our projects.
-#### Working With I/O Pins
-Let us begin with the input and output pins. The digital and analog I/O pins of the Arduino can be controlled directly through hardware registers. These pins are organized into groups, each managed by three main registers: PORTB, PORTC, and PORTD. These ports correspond to specific Arduino pins as shown in the following table:
-
-| Port      | Arduino Pins |
-| --------- | ------------ |
-| **PORTB** | D8 – D13     |
-| **PORTC** | A0 – A5      |
-| **PORTD** | D0 – D7      |
-
-
-The first step when working with I/O pins is to configure their data direction using the Data Direction Registers (DDRx). These registers determine whether each pin operates as an input or an output.     
-Let us create a simple project to turn on an LED using direct register manipulation. In this example, we will use digital pin D13. The first step is to build a simple circuit by connecting the LED to pin D13 through 220 ohm resistor.
-
-<img src="./attachments/circuit1.png" />
-
-Next, we connect the Arduino Uno board to the computer and create a new sketch in the Arduino IDE. Within the `setup()` function, we configure the pin as an output by setting the corresponding bit in the Data Direction Register.
-Each bit in the registers corresponds to a specific pin. The mapping between the bits and the pins is illustrated below.
-
-<img src="./attachments/portb_ddrb.png">
-
-To configure **pin D13** as an output, we must set bit 6 of the **DDRB** register to **1**. This corresponds to the binary value **00100000**, which is **32** in decimal.  
-Similarly, to output a **HIGH signal** on this pin, we must set bit 6 of the **PORTB** register to **1**.  
-With this understanding, we can now implement a simple program to control the LED connected to pin D13.
-```cpp
-void setup() {
-  DDRB = 0b100000;  
-  PORTB = 0b100000;  
-}
-void loop() {
-
-}
-```
-We can also configure pins to operate in input mode and read their state using the DDRx and PINx registers. To demonstrate this, we will extend our project by adding a push button connected to pin D3.   
-When the button is pressed, the LED connected to pin D13 will turn on. When the button is released, the LED will turn off.   
-First, we add a push button to pin D3. One side of the button is connected to the pin, and the other side is connected to **5V**, while a pull-down resistor keeps the input LOW when the button is not pressed.
-
-<img src="./attachments/circuit2.png" />
-
-After that we edit our program in the setup function we configure the pin D3 as an input. Since D3 belongs to PORTD, we will use the DDRD register to set its direction. To read the state of the button, we use the PIND register, which contains the current logic state of the pins in PORTD.
-
-Each bit in PIND corresponds to a pin in PORTD, just as in the DDRD and PORTD registers. Therefore, to read the state of pin D3, we check the fourth bit of the PIND register.
-
-With this configuration, the program continuously reads the state of the button and updates the LED accordingly.
+For two devices to talk serially, they need to agree on a few rules, primarily the Baud Rate, which represent the speed of the communication (bits per second). Common speeds are 9600 or 115200. If the sender is talking at 9600 and the receiver is listening at 115200, the data will look like gibberish and corrupted.
+#### Creating Project
+Let’s create a simple example of sending a message using serial communication. First, we connect the Arduino board to our computer using a USB cable. Then, in the Arduino IDE, we create a new sketch.  To work with serial communication, we use the `Serial` object. We first initialize the communication by specifying the baud rate inside the `setup()` function using `Serial.begin()`.   
+Once the communication is started, we can send data from the Arduino to the computer inside the `loop()` function using `Serial.print()` or `Serial.println()`.
 ```cpp
 void setup() {  
-  DDRB = 0b00100000;  
-  DDRD = 0b00000000;  
+  Serial.begin(9600); // Start serial communication at 9600 baud  
 }  
   
 void loop() {  
-  if (PIND & 0b00001000) { 
-    PORTB = 0b00100000;  
-  } else {  
-    PORTB = 0b00000000;    
-  }  
+  Serial.println("Hello from Arduino"); // Send a message  
+  delay(1000); // Wait 1 second  
 }
 ```
-We use a bitwise operator `&` to check the state of a specific bit in the register. The bitwise AND (`&`) operator performs a logical comparison between the bits of two values and returns the result of the operation.  
-Since we want to check only the fourth bit corresponding to pin D3, we perform a bitwise AND operation with the binary value 00001000. This value acts as a mask that isolates the bit of interest.
+Now the Arduino will send the message “Hello from Arduino” to our computer. We can read this message by opening the Serial Monitor from the Tools menu in the Arduino IDE.
 
-If the PIND register contains a value of the form **xxxx1xxx**, the result of the operation will be **00001000**, indicating that the button is pressed. Otherwise, if the bit is 0, the result will be **00000000**, indicating that the button is not pressed.
+<img src="./attachments/serial_arduino.png" />
 
-#### Working With Analog Input
-Let us move on to analogue inputs. Unlike digital pins that only read HIGH or LOW states, analogue pins can measure varying voltage levels. The Arduino uses a built-in Analog-to-Digital Converter (ADC) to translate these voltages into numbers ranging from **0** to **1023**.
+This will open a small window that displays the message on the screen.
 
-This process is controlled directly by specific ADC registers, primarily the **ADMUX** (ADC Multiplexer Selection Register) and the **ADCSRA** (ADC Control and Status Register A).
+<img src="./attachments/monitor.png" />
 
-To demonstrate analog input using register manipulation, we will rebuild automated plant-watering system. The output voltage of a resistance-based soil moisture sensor changes depending on the soil moisture level:
-- When the soil is **very wet**, the sensor outputs a **lower voltage**.
-- When the soil becomes **drier**, the sensor outputs a **higher voltage**.
-
-
-<img src="../Lecture 3/attachments/pump_circuit.png" />
-
-To read the analogue value, we first configure the **ADMUX** register. This register determines the reference voltage and selects which analogue pin to read from. Setting bit 6 to **1** selects the standard 5V reference. The lowest four bits select the channel; for pin **A0**, we leave them as **0000**. Therefore, the ADMUX register is set to **0b01000000**.
-
-Next, we configure the **ADCSRA** register to enable the ADC hardware and set its clock speed. Setting bit 7 to **1** enables the ADC. Setting the lowest three bits to **1** gives a division factor of 128, which provides the correct clock speed for accurate readings. This makes our ADCSRA value **0b10000111**.
-
-To start an analogue reading, we use the bitwise OR operator (`|`) to set bit 6 of the ADCSRA register to **1** without changing the other bits. We then use a `while` loop to continuously check this same bit. The hardware will automatically clear it to **0** the moment the conversion is complete. The resulting 10-bit value is then stored in the **ADC** register.
+We can also send data from the IDE to the Arduino board. To do this, we add a small condition inside the `loop()` function to check if data has been received. This is done using `Serial.available()`, which returns the number of bytes available to read. If data is available, we can read it byte by byte using `Serial.read()`.
 ```cpp
 void setup() {
-  ADMUX = 0b01000000;  
-  ADCSRA = 0b10000111;
-  DDRB = 0b000001; 
+  Serial.begin(9600); // Initialize serial communication at 9600 baud
+  Serial.println("Arduino is ready. Send me a message!");
+
 }
 
 void loop() {
-  ADCSRA = ADCSRA | 0b01000000; 
-  while (ADCSRA & 0b01000000) {
+
+  if (Serial.available() > 0) {
+    char receivedChar = Serial.read(); 
+    Serial.print("You sent: ");            
+    Serial.println(receivedChar); 
+  }
+}
+```
+Now send data from the ide we use the input box in the serial monitor
+
+<img src="./attachments/send_serial.png" />
+
+The `Serial.available()` function returns the number of bytes available to read. We can use this value in a `for` loop instead of repeatedly using an `if` statement. 
+```cpp
+void setup() {  
+	Serial.begin(9600); 
+	Serial.println("Arduino is ready. Type something in the Serial Monitor!");  
+}  
+  
+void loop() {  
+	for (int i = 0; i < Serial.available(); i++) {  
+		char receivedChar = Serial.read(); 
+		Serial.print("You sent: ");  
+		Serial.println(receivedChar); 
+	}
+}
+```
+### UART Protocol
+UART, which stands for Universal Asynchronous Receiver/Transmitter, is a hardware protocol used for serial communication between devices. With this communication protocol, we can connect our Arduino board to another Arduino board or to other electronic devices such as sensors, GPS modules, or Bluetooth modules.   
+
+UART communication uses two main pins:
+- TX (Transmit) sends data from the device
+- RX (Receive) receives data from another device
+
+#### UART Architecture
+To connect two devices together using UART communication, we link the transmitter (TX) of the first device to the receiver (RX) of the second device. Similarly, the receiver (RX) of the first device is connected to the transmitter (TX) of the second device. In other words, TX connects to RX, and RX connects to TX.   
+In addition, both devices must share a common ground (GND) so that they use the same voltage reference.   
+
+<img src="./attachments/uart.png" />
+
+After connecting the devices, we must ensure that both sides use the same baud rate, which defines the communication speed in bits per second. 
+#### Working Principle
+The data is transmitted as a sequence of electrical signals over the TX (Transmit) line. Each signal represents a binary value, where a HIGH voltage level represents 1 and a LOW voltage level represents 0.   
+The line normally stays in a HIGH state when idle. When a device wants to send data, it begins by transmitting a start bit, which is a LOW signal. This transition from HIGH to LOW informs the receiver that a new data frame is starting and allows it to synchronize its timing based on the configured baud rate.
+
+After the start bit, the transmitter sends the data bits, usually 8 bits per byte, one bit at a time over the TX (Transmit) line. Each bit is represented by an electrical signal where a HIGH voltage level represents 1 and a LOW voltage level represents 0.
+
+Once the data bits have been transmitted, an optional parity bit may be added for basic error detection. This bit helps the receiver verify whether the transmitted data may have been corrupted during transmission.
+
+Finally, the frame ends with one or more stop bits, which are HIGH signals. The stop bit marks the end of the data frame and returns the line to the idle HIGH state, allowing the receiver to recognize that the transmission has finished before waiting for the next start bit. 
+
+<img src="./attachments/uart_principle.png" />
+
+#### Arduino UART Configuration
+The Arduino Uno contains a single hardware UART module. This UART is connected to the following pins:
+- Pin 1 TX (Transmit)
+- Pin 0 RX (Receive)
+
+This can create a limitation because UART communication is a point-to-point protocol, meaning it normally connects only two devices at a time. In addition, these same pins are also used for communication with the computer when uploading programs or using the Serial Monitor.  
+To overcome this limitation, we can create software-based serial ports using the `SoftwareSerial` library. This library allows UART-like communication on other digital pins of the Arduino, for example pins 10 and 11, while keeping the hardware UART free for communication with the computer.
+#### Creating Project
+Let’s create a simple project where we connect three Arduino boards together using the UART protocol. In this project, we will use a master–slave architecture, where one Arduino acts as the master and the other two act as slaves. The master will send commands through UART communication, and the slave boards will perform actions based on the received command.   
+First, we need to connect the three Arduino boards together. Since UART communication uses TX and RX  lines, the transmitter of one device must be connected to the receiver of the other device.
+
+Because the Arduino Uno has only one hardware UART, we will use the hardware serial for communication between the master and one slave, and a software serial port for communication with the second slave.   
+The connections are as follows:   
+Master to Slave 1 (Hardware UART)
+- Master TX (Pin 1) Slave 1 RX (Pin 0)
+- Master RX (Pin 0) Slave 1 TX (Pin 1)
+
+Master to Slave 2 (Software UART)
+- Master Pin 11 (TX) Slave 2 RX (Pin 0)
+- Master Pin 10 (RX) Slave 2 TX (Pin 1)
     
-  }
-  if (ADC > 600){
-	   PORTB = 0b00001;
-  }else{
-	  PORTB = 0b00000;
-  }
-}
-```
+Finally, all three boards must share a common ground (GND).
 
+After connecting the Arduino boards together, we will add output and input components, Each slave Arduino will have an LED connected to it. we use pin 9 on the slaves board to control the led we connect them through 220Ω resistor. 
 
+Next, we add two push buttons to the master Arduino. These buttons will allow the user to send commands to the slave boards. We use pin 7 and pin 8 for the buttons: pin 7 will control the first slave Arduino, and pin 8 will control the second slave Arduino. When a button is pressed, the master Arduino will send a command through UART, and the corresponding slave will perform the required action.
 
-#### Bitwise Operators
-When working with microcontroller registers, data is manipulated bit by bit, since each bit typically controls or represents the state of a specific hardware feature or pin. Standard arithmetic and comparison operators are not suitable for this type of operation because they work on entire numerical values rather than on individual bits.   
-For this reason, programming languages such as C and C++ provide a special category of operators known as bitwise operators. These operators allow us to directly manipulate individual bits within a variable.     
-Bitwise operators perform logical operations at the binary level, enabling tasks such as setting, clearing, toggling, shifting, or testing specific bits in a register. 
+<img src="./attachments/uart_circuit.png" />
 
-The main bitwise operators used in embedded programming are:   
-**Bitwise AND (`&`)**  
-The AND operator returns 1 only if both bits are 1. It is commonly used with masks to check a specific bit.
-```
+Now let’s create our programs, starting with the master Arduino.
+First, we import the `SoftwareSerial` library to create a second UART port for communication with the second slave. Inside the `setup()` function, we initialize our UART communication:
+- The first UART uses the standard hardware serial for the first slave.
+- The second UART uses pins 11 (TX) and 10 (RX) for the second slave.
 
-Value:     10101100  
-Mask:      00001000  (masking bit 3)  
--------------------
-10101100 & 00001000 = 00001000
-```
-Here, only bit 3 is checked; all other bits are cleared.      
-**Bitwise OR (`|`)**     
-The OR operator returns 1 if at least one of the bits is 1. It is often used to set a bit without changing others.   
-```
+We also configure pins 7 and 8 as input pins to read the state of the push buttons.  
+Next, we create two boolean variables to keep track of the LED state for each slave. These variables will toggle every time a button is pressed.  
+Inside the `loop()` function, we read the state of the push buttons:
+- If the button connected to pin 7 is pressed, we toggle the first boolean variable and send a message (`"ON"` or `"OFF"`) to the first slave.
+- If the button connected to pin 8 is pressed, we toggle the second boolean variable and send a message to the second slave.
 
-Value:     10100000  
-Mask:      00001000  (setting bit 3)  
--------------------
-10100000 | 00001000 = 10101000
-```
-Only bit 3 is set; the other bits remain unchanged.     
-**Bitwise XOR (`^`)**    
-The XOR operator returns 1 if the bits are different. It is commonly used to toggle a bit.
-```
-Value:     10101000  
-Mask:      00001000  (toggle bit 3) 
--------------------
-10101000 ^ 00001000 = 10100000
-```
-Bit 3 has been flipped from 1 to 0.      
-**Bitwise NOT (`~`)**    
-The NOT operator inverts all bits, turning 0s into 1s and 1s into 0s.
-```
-Value:     10101000  
--------------------
-~10101000 = 01010111
-```
-All bits are inverted.     
-**Left Shift (`<<`)**  
-The left shift operator moves all bits left, filling vacated bits with 0s. Often used to create masks or multiply by powers of 2.
-```
-Value:     00000001  
--------------------
-00000001 << 3 = 00001000
-```
-Bit 0 has moved to bit 3.   
-**Right Shift (`>>`)**  
-The right shift operator moves all bits right, filling vacated bits with 0s. Often used to extract specific bits.
-```
-Value:     00001000  
-Shift >> 3:  
-00001000 >> 3 = 00000001
-```
-Bit 3 has been shifted to the least significant bit.
-
-#### Working With Timers and Counters
-The ATmega328P microcontroller used in the Arduino Uno contains three timers: **Timer0**, **Timer1**, and **Timer2**. Each timer is controlled through a set of registers that configure its behavior and monitor its state. The most commonly used registers include the Timer/Counter Control Registers (TCCRn), the Timer/Counter Register (TCNTn), and the Timer Interrupt Flag Register (TIFRn).    
-To demonstrate how timers work, we will create a simple project where an LED connected to pin D13 blinks every 5 seconds using a hardware timer.  
-First, we use the same circuit as before, where the LED is connected to pin D13 through a 220 Ω resistor.
-
-<img src="./attachments/circuit1.png" />
-
-Next, we configure pin D13 as an output by setting the corresponding bit in the DDRB register. After that, we configure Timer1.     
-Timer1 is a 16-bit timer, which allows it to count larger values compared to the 8-bit timers. This capability makes it suitable for generating longer and more precise delays.  
-The timer counts clock pulses derived from the microcontroller’s system clock. In the ATmega328P used in the Arduino Uno, the system clock frequency is 16 MHz, meaning the microcontroller generates 16,000,000 clock pulses per second.   
-This frequency is too high for directly measuring long time intervals. To address this, timers provide a mechanism called a prescaler, which divides the clock frequency by a fixed value before it reaches the timer counter. This effectively slows down the counting rate.   
-For example, if we apply a prescaler of 1024, the timer will increment once for every 1024 clock pulses instead of every single clock pulse. The effective counting frequency of the timer becomes:
-```
-16,000,000 / 1024 = 15625 counts per second
-```
-This means that 15,625 timer counts correspond to one second. Therefore, to generate a 5-second delay, the timer must count:
-```
-15625 × 5 = 78125 counts
-```
-Since Timer1 is a 16-bit timer with a maximum value of 65535, we instead use the overflow flag to detect when the timer reaches its maximum value and then we just check one counter value is greater or equal 12590.   
-To configure the timer, we use the TCCR1B register to set the prescaler and enable the timer. The TCNT1 register holds the current timer count, while the TIFR1 register indicates when an overflow occurs.   
-We can use the following table to set the prescaler   
-
-<img src="./attachments/prescal_table.png" />
-The **TCCR1A** register contains **8 bits** that are used to configure part of the behavior of **Timer1**. These bits mainly control how the timer interacts with certain output pins and help define the operating mode of the timer.
-- **COM1A1 and COM1A0 (bits 7–6):** Control the behavior of the **OC1A pin** (Output Compare A) when the timer reaches a compare value. These bits allow the timer to automatically **toggle, set, or clear the pin**. This feature is often used in **PWM generation or automatic signal output**.
-- **COM1B1 and COM1B0 (bits 5–4):** Work in the same way as the previous bits but for the **OC1B pin** (Output Compare B). They control how this second output pin behaves during a compare match.
-- **Bits 3 and 2:** These bits are **reserved**, meaning they are not used in this register. They are normally kept **0** to ensure proper operation.
-- **WGM11 and WGM10 (bits 1–0):** These bits are part of the Waveform Generation Mode (WGM) configuration. Together with the WGM bits in the TCCR1B register, they determine how the timer operates, such as normal counting mode, CTC mode, or PWM modes.
-
-We dont need automatic control of output pins , and we want the timer to work in a basic mode, so we set this register to
-```
-TCCR1A = 0b00000000;
-```
-To check whether a timer overflow has occurred, we read the TIFR1 register (Timer/Counter1 Interrupt Flag Register). This register contains several status flags that indicate events related to Timer1, the TOV1 bit in the TIFR1 register is set to 1 when Timer1 overflows, meaning the counter has reached its maximum value and returned to 0.
-
-<img src="./attachments/TIFR1.png"/>
-
-With this information, we can implement the LED blinking program. In the `setup()` function, we configure the necessary registers to initialize the timer and set the LED pin as an output.   
-In the `loop()` function, the program continuously checks whether an overflow has occurred. If an overflow is detected and the value of TCNT1 is greater than or equal to 12590, the program toggles the output pin connected to the LED. After that, the timer counter and the overflow flag are reset so the timing process can start again.
+Finally, we add a small delay of 500 ms to debounce the buttons and prevent multiple rapid triggers from a single press.
 ```cpp
-void setup() {
-  DDRB = 0b00100000;      // Set D13 as output
-  TCCR1A = 0b00000000;    // Timer1 normal mode
-  TCCR1B = 0b00000101;    // Prescaler = 1024
-  TCNT1  = 0;  
+#include <SoftwareSerial.h>  
 
-}
-void loop() {
-    if (TIFR1 & 0b00000001 && TCNT1 >= 12590) { // Approximate 5 seconds
-      TIFR1 = 0b00000001;       // clear timer overflow flag
-      PORTB ^= 0b00100000;      // Toggle LED
-      TCNT1 = 0;
-    }
-}
-```
 
-#### Working With PWM Output
-PWM allows us to simulate an analogue output by rapidly turning a digital pin on and off, varying the width of the active pulses. This is handled entirely in the background by the Arduino’s hardware timers.  
-The PWM pins are connected and controlled with the internal timer registers as following:
+SoftwareSerial slave2Serial(10, 11); // RX, TX  
 
-|PWM Pin|Timer|
-|---|---|
-|D3, D11|Timer2|
-|D5, D6|Timer0|
-|D9, D10|Timer1|
-
-To set PWM output, we work with the Timer registers TCCR2A and TCCR2B in additional to OCR2B (Output Compare Register) register which set the duty cycle.
-
-First, we must configure pin D3 as an output. Since D3 is located on PORTD, we set bit 3 of the DDRD register to 1, giving us the binary value 0b00001000.   
-
-Next, we configure Timer2. In TCCR2A, setting **bit 5 (COM2B1)** to 1 configures non-inverting PWM on OC2B (pin D3). This means the output starts HIGH at the beginning of the timer cycle and goes LOW when the counter reaches the **OCR2B** value.  Then we set bits 1 and 0 (WGM21 and WGM20) to enable Fast PWM mode. In this mode, the timer counts from 0 to 255 and then automatically resets to 0, producing a continuous PWM waveform.   This gives us the binary value **0b00100011**. In **TCCR2B**, we set the timer prescaler to dictate how fast the pulses occur. Setting bit 2 to 1 sets a prescaler of 64, giving us 0b00000100.
-
-The brightness of the LED is now controlled directly by the OCR2B register. By writing a value between **0** (always off) and **255** (always on) to OCR2B, the hardware automatically adjusts the pulse width without requiring our code to manually toggle the pin on and off.
-```cpp
-void setup() {
-  DDRD = 0b00001000; 
+bool led1State = false;  
+bool led2State = false;  
   
-  TCCR2A = 0b00100011; 
-  TCCR2B = 0b00000100; 
-}
-
-void loop() {
-  for (int i = 0; i <= 255; i++) {
-    OCR2B = i;
-    delay(10);
-  }
+void setup() {  
+// Initialize UART communication  
+	Serial.begin(9600); // Hardware UART for first slave  
+	slave2Serial.begin(9600); // Software UART for second slave  
   
-  for (int i = 255; i >= 0; i--) {
-    OCR2B = i;
-    delay(10);
-  }
+	pinMode(7, INPUT);  
+	pinMode(8, INPUT);  
+}  
+  
+void loop() {  
+	if (digitalRead(7) == HIGH) {  
+		led1State = !led1State; 
+		if (led1State) {  
+			Serial.println("ON"); 
+		} else {  
+			Serial.println("OFF");  
+		}  
+	delay(500);  
+	}  
+  
+	if (digitalRead(8) == HIGHT) {  
+		led2State = !led2State; 
+		if (led2State) {  
+			slave2Serial.println("ON");  
+		} else {  
+			slave2Serial.println("OFF");  
+		}  
+	delay(500); 
+	}  
 }
 ```
-#### Working With Interrupts
-Another important feature of microcontrollers is the ability to use interrupts. An interrupt allows the microcontroller to immediately respond to an event without constantly checking for it inside the `loop()` function.    
-Normally, a program runs instructions sequentially. However, when an interrupt event occurs, the microcontroller temporarily pauses the current program, executes a special function called an Interrupt Service Routine (ISR), and then returns to the main program.  
+Now we create the program for the slave board, First, inside the `setup()` function, we set pin 9 as an output pin for the LED and start serial communication at a baud rate of 9600, which must match the master.  Next, we create a string variable to store the data received from the master through UART.
 
-Interrupts are useful when reacting to external events, such as pressing a button, receiving data, or when a timer reaches a certain value.  
-The ATmega328P microcontroller used in the Arduino Uno provides several interrupt sources. One of the most commonly used is the external interrupt, which can be triggered by a signal change on specific pins.
-
-To demonstrate how interrupts work, we will create a simple project where a push button toggles an LED connected to **pin D13**. Each time the button is pressed, an interrupt is triggered and the LED changes its state.
-
-First, we build the circuit by connecting:
-
-- an **LED** to **pin D13** through a **220 Ω resistor**
-- a **push button** to **pin D3**, we connect it to VCC through a pull-up resistor, and the other side of the button is connected to GND.
-
-<img src="./attachments/circuit3.png" />
-
-
-Next, we configure the LED pin as an output and the button pin as an input. To enable the external interrupt, several registers must be configured.
-
-The EIMSK register (External Interrupt Mask Register) is used to enable or disable external interrupts. Each bit corresponds to one interrupt source.
-- **INT0 (bit 0):** Enables the interrupt for **pin D2**
-- **INT1 (bit 1):** Enables the interrupt for **pin D3**
-
-To enable the interrupt for **pin D3**, we set **bit 1** of the **EIMSK** register.   
-The **EICRA** register (**External Interrupt Control Register A**) defines which signal change triggers the interrupt. For example, the interrupt can occur on a low level, rising edge, falling edge, or any logical change.   
-For our project, we configure the interrupt to trigger on the falling edge, which occurs when the button is pressed.   
-
-<img src="./attachments/Eicra.png" />
-
-After enabling the interrupt, we also need to enable global interrupts using the `sei()` function. Without this step, the microcontroller will ignore all interrupt events.   
-When the interrupt occurs, the microcontroller automatically calls a special function called the **Interrupt Service Routine (ISR)**. Inside this function, we simply toggle the LED.
-
-The following program implements this behavior.
+Finally, inside the `loop()` function, we check if data has been sent using `Serial.available()`. If data is available, we read it. If the received message is `"ON"`, we turn the LED on. If it is `"OFF"`, we turn the LED off.
 ```cpp
-#include <avr/interrupt.h>
+String receivedData = ""; 
+  
+void setup() {  
+	pinMode(9, OUTPUT);  
+	Serial.begin(9600); 
+}  
+  
+void loop() {  
+ 
+	if (Serial.available() > 0) {  
+		receivedData = Serial.readStringUntil('\n'); 
+		if (receivedData == "ON") {  
+			digitalWrite(9, HIGH);
+		} else if (receivedData == "OFF") {  
+			digitalWrite(9, LOW); 
+		}  
+	}  
+}
+```
+### I2C Protocol
+The UART protocol works perfectly, but it has a small limitation: it is a point-to-point communication protocol. This means that it normally connects only two devices together. If we want to add more devices,  we need more pins and more independent serial ports (like using `SoftwareSerial`). As the number of sensors and modules grows, we quickly consume all our available pins. To solve this, a new protocol has been developed: I2C.
+
+I2C, which stands for Inter-Integrated Circuit, is a serial communication protocol that allows multiple devices to communicate using only two wires. With I2C, we can connect many devices such as sensors, displays, EEPROM memory, and other microcontrollers to the same communication bus while using only two pins on the Arduino.  
+The two communication lines used in the I2C protocol are:
+- SDA (Serial Data Line) used to transfer data between devices
+- SCL (Serial Clock Line) used to synchronize the communication using a clock signal
+#### I2C Architecture
+Unlike UART, where each connection requires a separate pair of wires, all I2C devices share the same SDA and SCL lines. This allows multiple devices to be connected in parallel on the same bus.   
+In an I2C system, devices are organized using a master–slave architecture:
+- The master device controls the communication and generates the clock signal on the SCL line.
+- The slave devices respond to the master when they are addressed.
+
+<img src="./attachments/i2c_bus.png" />
+
+Each slave device connected to the I2C bus has a unique address. When the master wants to communicate with a specific device, it sends the address of that device on the SDA line. Only the device with the matching address will respond, while the others remain inactive.
+#### Working Principle
+The Communication in I2C follows a specific sequence of events. The master begins by generating a Start condition, which occurs when the SDA line changes from HIGH to LOW while SCL is HIGH. This signals all devices on the bus that a communication session is beginning.
+
+After the start condition, the master sends the 7-bit address of the slave device, followed by a read/write bit that indicates whether the master wants to send data to the slave or receive data from it.
+
+Once the address is transmitted, the addressed slave responds with an ACK (acknowledge) bit, confirming that it is ready to communicate. The master and slave can then exchange data bytes, where each byte consists of 8 bits followed by another acknowledge bit.
+
+When the communication is finished, the master sends a Stop condition, which occurs when the SDA line changes from LOW to HIGH while SCL is HIGH. This indicates that the data transmission has ended and the bus becomes idle again.
+
+<img src="./attachments/i2c_principle.png" />
+
+
+#### Arduino I2C Configuration
+On the Arduino Uno, the hardware I2C interface uses the following pins:
+- A4 – SDA (Serial Data)
+- A5 – SCL (Serial Clock)
+
+These pins allow the Arduino to communicate with multiple I2C devices using the same two wires.
+#### Creating Project
+Now let's create a simple project where three Arduino boards and an LCD display communicate using the I2C protocol. In this system, one Arduino acts as the master, while the other two act as slave devices. The master sends commands to the slaves, and each slave controls an LED based on the received command. In addition, an LCD display connected to the master Arduino shows the current state of each slave’s LED.    
+First, we connect the three Arduino boards and the LCD display using the I2C bus.
+- All SDA pins (A4) are connected together.
+- All SCL pins (A5) are connected together.
+- All devices share a common GND.
+
+Next, we connect an LED to each slave Arduino.  Each LED is connected to pin 9 through a 220Ω resistor.
+On the master Arduino, we add two push buttons to send commands to the slaves:
+- Pin 7 controls the first slave
+- Pin 8 controls the second slave
+
+When a button is pressed, the master Arduino sends a command through the I2C bus to the corresponding slave device. The slave receives the command and toggles the state of its LED. At the same time, the LCD display connected to the master Arduino is updated to show the current state of each slave’s LED.
+
+<img src="./attachments/i2c_circuit.png" />
+
+Now let's create the program for the master Arduino.   
+First, we include the Wire library, which allows the Arduino to communicate using the I2C protocol, and the LiquidCrystal_I2C library, which allows us to control the LCD display through the I2C bus.  
+Inside the `setup()` function, we initialize the I2C communication using `Wire.begin()`, configure the button pins as inputs, and initialize the LCD display. The LCD is then used to display the current state of each slave’s LED.
+
+Inside the `loop()` function, the Arduino continuously checks whether one of the buttons is pressed. When a button is pressed, the master toggles the state of the corresponding slave LED and sends a command to that slave using its I2C address. After sending the command, the LCD display is updated to show the new state of each slave.
+```cpp
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); // LCD I2C address
+
+bool led1State = false;
+bool led2State = false;
 
 void setup() {
-  DDRB = 0b00100000;     
-  DDRD = 0b00000000;   
-  EIMSK = 0b00000010;    
-  EICRA = 0b00000010; 
-  PORTB = 0; 
-  PORTD = 0b1000; 
-  sei();                 
+
+    Wire.begin(); 
+    pinMode(7, INPUT);
+    pinMode(8, INPUT);
+    lcd.init();
+    lcd.backlight();
+    lcd.setCursor(0,0);
+    lcd.print("Slave1: OFF");
+    lcd.setCursor(0,1);
+    lcd.print("Slave2: OFF");
+}
+
+void loop() {
+    if (digitalRead(7) == HIGH) {
+        led1State = !led1State;
+        Wire.beginTransmission(8); // Address of slave 1
+        lcd.setCursor(0,0);
+	    lcd.print("Slave1: ");
+        if (led1State) {
+	        lcd.print("ON ");
+            Wire.write("ON");
+        } else {
+            lcd.print("OFF");
+            Wire.write("OFF");
+        }
+        Wire.endTransmission();
+        delay(500);
+    }
+
+    if (digitalRead(8) == HIGH) {
+        led2State = !led2State;
+        Wire.beginTransmission(9); // Address of slave 2
+        lcd.setCursor(0,1);
+        lcd.print("Slave2: ");
+        if (led2State) {
+            lcd.print("ON ");
+            Wire.write("ON");
+        } else {
+            lcd.print("OFF");
+            Wire.write("OFF");
+        }
+        Wire.endTransmission();
+        delay(500);
+    }
+}
+```
+Next, we create the program for the slave Arduino boards. Both slave boards will run the same program*, but each one will have a different I2C address.
+
+Inside the `setup()` function, we initialize the I2C communication using `Wire.begin(address)`, where the address uniquely identifies the slave device on the I2C bus. We also register a function called `receiveEvent()`, which is automatically executed whenever the slave receives data from the master.    
+Inside this function, the slave reads the received message and controls the LED accordingly.
+```cpp
+#include <Wire.h>
+
+String receivedData = "";
+
+void setup() {
+
+    pinMode(9, OUTPUT);
+
+    Wire.begin(8); // Change to 9 for the second slave
+    Wire.onReceive(receiveEvent);
 }
 
 void loop() {
 }
 
-ISR(INT1_vect) {
-  PORTB ^= 0b00100000;   
+void receiveEvent(int bytes) {
+
+    receivedData = "";
+
+    while (Wire.available()) {
+        char c = Wire.read();
+        receivedData += c;
+    }
+
+    if (receivedData == "ON") {
+        digitalWrite(9, HIGH);
+    }
+    else if (receivedData == "OFF") {
+        digitalWrite(9, LOW);
+    }
+}
+```
+### SPI Protocol
+The I2C protocol is highly efficient for connecting many devices with just two wires, but it has some limitations. Because it uses a single data line for both sending and receiving, it operates in half-duplex mode it cannot send and receive data at the same time. Additionally, the use of pull-up resistors limits its maximum communication speed. When a project requires transferring large amounts of data very quickly such as reading an SD card or driving a high-resolution color display I2C can become a bottleneck. To solve this need for speed and simultaneous two-way communication, we use the SPI protocol.   
+SPI, which stands for Serial Peripheral Interface, is a synchronous serial communication protocol designed for short-distance, high-speed communication. Unlike I2C, SPI operates in full-duplex mode, meaning devices can send and receive data simultaneously.  
+Instead of just two wires, SPI typically uses four communication lines:  
+- MOSI (Master Out Slave In): Used by the master to send data to the slave.    
+- MISO (Master In Slave Out): Used by the slave to send data back to the master.
+- SCK (Serial Clock): Used to synchronize the communication, generated by the master.
+- SS (Slave Select) or CS (Chip Select): Used by the master to choose which specific slave it wants to talk to.
+
+#### SPI Architecture
+Unlike I2C, where all devices share the same lines and are identified by a software address, SPI uses a dedicated hardware line for every slave device.
+- The master device controls the clock (SCK) and initiates all communication.
+- The slave devices remain idle until the master activates their specific Slave Select (SS) line.
+    
+When the master wants to communicate with a specific slave, it pulls the SS line of that slave LOW. This "wakes up" the slave. All other slaves whose SS lines are HIGH will ignore the master's clock and data signals, effectively disconnecting their MISO lines from the bus so they don't interfere.
+
+<img src="./attachments/spi_bus.png" />
+
+#### Working Principle
+Communication in SPI is incredibly fast because it relies on simple shift registers rather than complex addressing and acknowledgment sequences.
+
+The process begins when the master pulls the SS line of the target slave LOW. The master then starts generating the clock signal on the SCK line.
+
+During each clock cycle, full-duplex data transfer occurs: the master sends one bit of data out on the MOSI line, and the slave reads it. At the exact same time, the slave sends one bit of data out on the MISO line, and the master reads it. This simultaneous exchange continues until the full data byte is transferred.
+
+Because there are no addresses to send and no acknowledge (ACK) bits to wait for, the data flows seamlessly and continuously. Once the data exchange is complete, the master pulls the SS line HIGH, ending the communication and putting the slave back to sleep.
+
+SPI ideal for high-speed sensors, displays, SD cards, and other timing-sensitive peripherals.
+ 
+<img src="./attachments/spi_signal.png" />
+
+#### Arduino SPI Configuration
+On the Arduino Uno, the hardware SPI interface is tied to specific pins:
+- 11 – MOSI (Master Out Slave In)
+- 12 – MISO (Master In Slave Out)
+- 13 – SCK (Serial Clock)
+- 10 – SS (Slave Select) While pins 11, 12, and 13 must be shared among all SPI devices, the master can use any available digital pin to act as an additional SS pin when communicating with multiple slaves.
+#### Creating Project
+Now let's create a simple project where three Arduino boards communicate using the SPI protocol. One Arduino acts as the master, while the other two act as slave devices, the master sends commands to the slaves based on button presses, and each slave controls an LED based on the received command.
+
+First, we connect the three Arduino boards using the SPI bus:
+- All MOSI pins (11) are connected together.
+- All MISO pins (12) are connected together.
+- All SCK pins (13) are connected together.
+- All devices share a common GND.
+    
+Next, we establish the Slave Select connections. The master Arduino uses two different pins to control the slaves:
+- Master Pin 10 connects to Slave 1's Pin 10 (SS1).
+- Master Pin 9 connects to Slave 2's Pin 10 (SS2).
+    
+We connect an LED to Pin 9 of each slave Arduino. On the master Arduino, we add two push buttons:
+- Pin 7 controls the first slave.
+- Pin 8 controls the second slave.
+
+
+<img src="./attachments/spi_circuit.png" />
+
+
+Now let's create our program. We start with the master Arduino program.
+First, we include the SPI library, which allows the Arduino to communicate using the SPI protocol. After that, we create two variables to store the state of each slave LED. These variables help us keep track of whether the LED is currently ON or OFF so that every button press toggles its state.
+
+Inside the `setup()` function, we configure the push buttons (pins 7 and 8) as inputs. We also configure the Slave Select pins as outputs because the master controls them. Initially, we set both SS pins to HIGH so that no slave device is selected when the system starts. Finally, we initialize the SPI communication using `SPI.begin()`.  
+Inside the `loop()` function, the Arduino continuously checks if one of the buttons is pressed. When a button is pressed, the master toggles the corresponding LED state variable. Then it selects the appropriate slave by setting its SS pin LOW, sends the command using `SPI.transfer()`, and finally sets the SS pin HIGH again to end the communication.
+
+```cpp
+#include <SPI.h>
+
+bool led1State = false;
+bool led2State = false;
+
+void setup() {
+    pinMode(7, INPUT);
+    pinMode(8, INPUT);
+    
+    // Set SS pins as outputs
+    pinMode(9, OUTPUT);
+    pinMode(10, OUTPUT);
+    
+    // Keep SS pins HIGH so no slaves are selected initially
+    digitalWrite(9, HIGH);
+    digitalWrite(10, HIGH);
+    
+    // Initialize SPI communication
+    SPI.begin();
+}
+
+void loop() {
+    // Check button 1
+    if (digitalRead(7) == HIGH) {
+        led1State = !led1State;
+        
+        digitalWrite(9, LOW);  // Select Slave 1
+        if (led1State) {
+            SPI.transfer('O');  
+			SPI.transfer('N');  
+        } else {
+            SPI.transfer('O');  
+			SPI.transfer('F');  
+			SPI.transfer('F');           
+        }
+        digitalWrite(9, HIGH); // Deselect Slave 1
+        
+        delay(500);
+    }
+
+    if (digitalRead(8) == HIGH) {
+        led2State = !led2State;
+        
+        digitalWrite(10, LOW);  // Select Slave 2
+        if (led2State) {
+            SPI.transfer('O');  
+			SPI.transfer('N');            
+        } else {
+            SPI.transfer('O');  
+			SPI.transfer('F');  
+			SPI.transfer('F');         
+        }
+        digitalWrite(10, HIGH); // Deselect Slave 2
+        
+        delay(500);
+    }
+}
+```
+Next, we create the program for the slave Arduino boards. In Arduino, acting as an SPI slave requires turning on a specific hardware register and using an interrupt to catch incoming data. Both slave boards will run the exact same program because the master dictates who it is talking to via the hardware SS wiring.
+
+Inside the `setup()` function, we configure the Arduino to operate as an SPI slave device. First, we set the LED pin as an output. Then we enable SPI in slave mode by activating the SPI hardware in the control register. We also enable SPI interrupts so the Arduino can automatically react whenever the master sends data.   
+When the master transmits data through the SPI bus, the `SPI_STC_vect` interrupt service routine is automatically triggered. Inside this routine, the received byte is read from the SPI Data Register (`SPDR`) and stored in a variable.  
+Since the master sends the messages "ON" and "OFF", the slave collects the incoming characters into a small string. Once the message is complete, the program checks the received command and turns the LED ON or OFF accordingly.
+
+Inside the `loop()` function, the Arduino simply checks if a new command has been received. If the command is `"ON"`, the LED is turned on. If the command is `"OFF"`, the LED is turned off.
+```cpp
+#include <SPI.h>
+
+volatile String receivedData = "";
+volatile bool newData = false;
+
+void setup() {
+    pinMode(9, OUTPUT);
+    SPCR |= bit(SPE);
+    SPI.attachInterrupt();
+}
+
+
+ISR (SPI_STC_vect) {
+
+    char c = SPDR;  
+    receivedData += c;  
+    if (receivedData == "ON" || receivedData == "OFF") {
+        newData = true;
+    }
+}
+
+void loop() {
+
+    if (newData) {
+        if (receivedData == "ON") {
+            digitalWrite(9, HIGH);
+        }
+        else if (receivedData == "OFF") {
+            digitalWrite(9, LOW);
+        }
+        receivedData = "";  
+        newData = false;    
+    }
+}
+```
+## Wireless Communication
+Up to this point, we have connected all of our devices and microcontrollers using physical wires. But what if we want to control our project from across the room, or monitor sensor data from anywhere in the world? Arduino Uno do not have built-in wireless capabilities.  
+To solve this, we rely on external add-on components called wireless modules. These modules act as a bridge, taking the wired protocols we just learned about (usually UART or SPI) and translating them into invisible radio waves. The two most common ways to cut the cord are through Bluetooth and Wi-Fi.
+### Bluetooth
+Bluetooth is a short-range wireless communication standard. It is perfect for connecting two devices directly together (point-to-point) over short distances, such as controlling an Arduino from a smartphone or linking two robots in the same room.  
+At its core, a basic Arduino Bluetooth module acts as a "wireless serial cable." It uses radio frequencies in the 2.4 GHz band to transmit data. When we type a character on our phone's Bluetooth app, it travels through the air to the module. The module then translates that radio signal back into a standard UART serial signal (RX and TX) that the Arduino can easily read, exactly as if it were plugged in via a USB cable.
+
+To add Bluetooth to an Arduino, we typically use an inexpensive module like the HC-05 or HC-06.  
+The HC-05 module can operate in both master and slave modes, it can either initiate a connection to another Bluetooth device or wait for another device to connect to it.  
+The HC-06 module is simpler and works only in slave mode, meaning it can only receive connections from another device such as a smartphone or computer.
+
+Let's create a simple project where we control an LED using a smartphone through Bluetooth with the HC-05 module. In this system, the smartphone sends commands wirelessly to the Arduino through Bluetooth. The HC-05 receives the data and forwards it to the Arduino through serial communication, and the Arduino turns the LED ON or OFF depending on the received command.
+
+First, connect the HC-05 Bluetooth module to the Arduino:
+- VCC to 5V
+- GND to GND
+- TX to Arduino RX (Pin 0)
+- RX to Arduino TX (Pin 1)    
+
+Next, connect an LED to pin 6 of the Arduino through a 220 Ω resistor, and connect the other side of the LED to GND.
+
+<img src ="./attachments/hc_05.png" />
+
+Now let’s create our program. Since the HC-05 uses the UART protocol, we start by initializing the serial communication in the `setup()` function so that the Arduino can communicate with the Bluetooth module. After that, we configure pin 6 as an output pin to control the LED.
+
+Inside the `loop()` function, the Arduino continuously checks if data is available from the Bluetooth module. When a message is received, the Arduino reads it, trims any extra whitespace, and compares it with the expected commands to control the LED. Sending "ON" turns the LED on, while "OFF" turns it off.
+```cpp 
+
+
+String receivedData = "";
+
+void setup() {
+  pinMode(6, OUTPUT);
+  Serial.begin(9600);        
+}
+
+void loop() {
+ 
+  if (Serial.available()) {
+    receivedData = Serial.readString();
+    receivedData.trim();
+    if (receivedData == "ON") {
+      digitalWrite(6, HIGH);
+    }
+
+    else if (receivedData == "OFF") {
+      digitalWrite(6, LOW);
+   
+    }
+  }
+}
+```
+Once the program is uploaded, we pair our smartphone with the HC-05 module (default password is usually 1234 or 0000). Then using [Bluetooth terminal app](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal) we can send the commands ON or OFF to control the LED wirelessly.  
+
+If there is a problem with the Bluetooth communication, we can debug it by displaying the data received from the Bluetooth app in the Serial Monitor.  First, connect the Bluetooth module to the Arduino:  
+- VCC with 5V
+- GND with GND
+- TX with Pin 2
+- RX with Pin 3
+
+Next, in our program we create a software serial communication on pins 2 and 3 using the SoftwareSerial library. This allows the Arduino to communicate with the Bluetooth module while still using the normal serial port for debugging.  
+Finally, in the ``loop()`` function, the Arduino reads the data sent by the Bluetooth app and prints it in the Serial Monitor so we can see exactly what is being received.
+
+```cpp
+#include <SoftwareSerial.h>
+
+SoftwareSerial bluetooth(2, 3); // RX, TX
+
+String receivedData = "";
+
+void setup() {
+  Serial.begin(9600);       // Serial Monitor
+  bluetooth.begin(9600);    // Bluetooth module
+
+  Serial.println("Bluetooth debugging started...");
+}
+
+void loop() {
+
+  if (bluetooth.available()) { 
+    receivedData = bluetooth.readString();
+    receivedData.trim(); 
+    Serial.print("Data received: ");
+    Serial.println(receivedData);
+  }
 
 }
 ```
-## Functions :
+If an extra line appears after the received data is printed, that means the phone app is sending the message with a newline character. This can be changed in the app settings. Alternatively, in the Arduino program we can use ``readStringUntil('\n')``, which stops reading when it reaches the newline character.
+#### Debug and Configure The Bluetooth module
+The good thing about the HC-05 and HC-06 Bluetooth Module is that they can be configured. We can change several settings such as the device name, password, and baud rate. These settings are modified using AT commands.  
 
-### Introduction :
-In previous lectures, we made basic sketches to control LEDs and read sensors. However, there are situations where we need to use a functionality multiple times like converting an analog sensor reading into a voltage. Copying and pasting the same code repeatedly makes our sketch unnecessarily large, consumes precious flash memory, and makes it harder to manage. To address this, we use functions. Functions allow us to convert blocks of code into reusable components, making our microcontroller programs more efficient and organized.
+The HC-05 module is more advanced and supports many configuration commands. Some useful commands include checking the connection with ``AT``, reading or changing the device name using ``AT+NAME``, viewing the device address using ``AT+ADDR``, checking the firmware version using ``AT+VERSION``, changing the baud rate using ``AT+UART``, changing the role (master or slave) using ``AT+ROLE``, resetting the module using ``AT+RESET``, restoring factory settings with AT+ORGL, and changing the password using ``AT+PSWD``.
 
-### Create Functions :
-To create a function, we need to follow these steps:
-1. Identify the block of code that we want to turn into reusable code.
-2. Choose a descriptive function name.
-3. Identify the parameters that the function will need and their types.
-4. Identify the value that we want the function to return and its type.
+The HC-06 module supports fewer commands because it works only as a slave device. However. With AT commands we can check the connection using ``AT``, change the device name using ``AT+NAME``, change the baud rate using ``AT+BAUD``, change the pairing password using ``AT+PIN``, and check the firmware version using ``AT+VERSION``.  
 
-Let's start by creating a simple function that prints the state of pin 3 to the Serial Monitor.
-This function does not return any value and does not require any input parameters. Therefore, its return type will be `void`, and the parentheses will be empty.
+Here simple example of program to configure the HC module, by using the Serial Monitor, any command typed in the Serial Monitor is sent to the Bluetooth module. The response from the module is then printed back to the Serial Monitor.  
 ```cpp
-void printPin3State() {
-  int state = digitalRead(3);
-  Serial.println(state);
+#include <SoftwareSerial.h>
+
+SoftwareSerial bluetooth(2, 3); 
+
+void setup() {
+
+  Serial.begin(9600);
+  bluetooth.begin(9600);   
+  Serial.println("Enter AT commands:");
+
+}
+
+void loop() {
+  // Send command from Serial Monitor to Bluetooth
+  if (Serial.available()) {
+    bluetooth.write(Serial.read());
+  }
+
+  // Show response from Bluetooth module
+  if (bluetooth.available()) {
+    Serial.write(bluetooth.read());
+  }
 }
 ```
-Now, to use this function, we simply call it where we want to execute it. To call a function, we write its name followed by parentheses.
+Example of commands for HC-05
+```
+AT
+AT+NAME=MyBluetooth // will  set name
+AT+PSWD=1234 // will set password
+AT+UART=9600,0,0
+```
+If there was problem when sending the command using the serial monitor, try change it setting to send the message only and don't add new line after the command, this can be set from here.
+
+<img src="./attachments/monitor_bluetooth.png">
+
+### Wi-Fi
+Wi-Fi is a wireless communication technology that allows devices to connect over a network instead of directly to each other. Unlike Bluetooth, which is mainly used for short-range point-to-point communication, Wi-Fi enables an Arduino to communicate over longer distances and even connect to the internet. This makes it ideal for IoT (Internet of Things) applications such as remote monitoring, smart home systems, and web-based control.  
+At its core, a basic Arduino Wi-Fi module acts as a "wireless network bridge." It uses radio frequencies in the 2.4 GHz band to transmit and receive data over a network using standard network protocols like TCP/IP. When a command is sent from a web browser or an app over the Wi-Fi network, it travels to the router and then to the module. The module translates these complex network packets (TCP/IP) back into standard UART serial signals (RX and TX), which the Arduino can read exactly as if it were plugged in via a USB cable.
+
+Since the Arduino UNO does not have built-in Wi-Fi, we need an external module such as the ESP8266. This module  communicates with the Arduino using serial (UART), similar to the Bluetooth modules, but it adds full Wi-Fi networking capabilities, It can operate in Station (STA) mode to connect to an existing Wi-Fi router, Access Point (AP) mode to broadcast its own standalone Wi-Fi network, or both simultaneously.
+
+<img src="./attachments/esp_01pins.png" />
+
+
+Let’s create a simple project where we display weather data on an LCD using an API through Wi-Fi with the ESP-01 module. In this system, the ESP-01 connects to the internet, requests weather data from an API, sends the raw response to the Arduino through serial communication, and the Arduino extracts useful information (like temperature) and displays it on the LCD.
+
+First, Lets create the circuit we start by connecting the ESP-01 Wi-Fi module to the Arduino. The ESP-01 operates strictly on 3.3V logic, so its VCC must be connected to 3.3V, not 5V:
+- VCC to 3.3V
+- CH_PD (or EN) to 3.3V
+- GND to GND
+- TX to Arduino RX (Pin 0)
+- RX to Arduino TX (Pin 1)
+
+Next, we connect the  I2C LCD display (16x2 with I2C module) to reduce the number of pins:
+- VCC to 5V
+- GND to GND
+- SDA to A4 (Arduino Uno)
+- SCL to A5 (Arduino Uno)
+
+<img src ="./attachments/esp_project.png" />
+
+Now let’s create our program. The ESP-01 uses the UART protocol to communicate via AT commands, we start by initializing serial communication in the `setup()` function. We will send AT commands to connect to the Wi-Fi network, after that we initialize the I2C LCD.  
+Inside the `loop()` function, the Arduino requests weather data periodically. When the ESP-01 receives the response, it sends the raw JSON data back. We read this data, extract useful values , and display them on the LCD.
+
 ```cpp
-void printPin3State() {
-  int state = digitalRead(3);
-  Serial.println(state);
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+String receivedData = "";
+
+void setup() {
+  Serial.begin(115200); 
+  lcd.init();
+  lcd.backlight();
+  lcd.print("Connecting...");
+  
+  delay(1000);
+  
+  Serial.println("AT+CWMODE=1"); 
+  delay(1000);
+  Serial.println("AT+CWJAP=\"YourNetworkName\",\"YourPassword\""); // replace with your data
+  delay(5000);
+  lcd.clear();
+  lcd.print("WiFi Connected");
 }
+
+void loop() {
+  Serial.println("AT+CIPSTART=\"TCP\",\"api.openweathermap.org\",80");
+  delay(2000);
+  // Replace with your API key and city
+  String request = "GET /data/2.5/weather?q=London&appid=YOUR_API_KEY HTTP/1.1\r\nHost: api.openweathermap.org\r\n\r\n";
+  Serial.print("AT+CIPSEND=");
+  Serial.println(request.length());
+  delay(1000);
+  Serial.print(request);
+  delay(5000);
+
+  // Read response
+  if (Serial.available()) {
+    receivedData = Serial.readString();
+    int tempIndex = receivedData.indexOf("temp");
+    if (tempIndex != -1) { 
+      String tempValue = receivedData.substring(tempIndex + 6, tempIndex + 11);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Temp:");
+      lcd.setCursor(0, 1);
+      lcd.print(tempValue);
+    }
+  }
+  delay(10000); // Update every 10 seconds
+}
+```
+The ESP8266 is configured using AT commands same as the hC-05. In our Program First, we use `AT+CWMODE=1` to choose the connection mode, where 1 means Station mode, allowing the module to connect to an existing Wi-Fi network.
+
+After that, we use `AT+CWJAP` to establish the connection. We send the network name followed by a comma and then the password, so the ESP-01 can join the Wi-Fi.  
+Next, we use `AT+CIPSTART` to start a TCP connection with the weather server (`api.openweathermap.org`) on port 80. Then we use `AT+CIPSEND` to send the HTTP request that asks for the weather data.
+
+The module then sends back the response (in JSON format) through serial communication. To extract the temperature, we search for the keyword `"temp"` inside the received string. Once found, we shift 6 characters forward because the response format is like `"temp":23.45`, so the actual value starts right after `"temp":`. The `indexOf` function returns the index of the letter t, and with that shift, we can get the temperature value and display it on the I2C LCD.
+
+#### Debug and Configure The Wifi module
+The ESP-01 module is very advanced and supports a wide range of networking commands. It can operate in Station mode (STA) or Access Point mode (AP), which means it can either connect to our home router or create its own Wi-Fi network for other devices to connect to directly.
+
+Some useful commands include checking if the module is responding with `AT`, setting the Wi-Fi mode using `AT+CWMODE`, joining a network using `AT+CWJAP`, checking the assigned IP address using `AT+CIFSR`, enabling multiple connections with `AT+CIPMUX`, starting a server with `AT+CIPSERVER`, and resetting the module using `AT+RST`.
+
+We can test and explore these commands using the Serial Monitor. First, we change the wiring and use pins 2 and 3 for UART communication:
+- VCC with 3.3V
+- CH_PD with 3.3V
+- GND with GND
+- TX with Pin 2
+- RX with Pin 3
+
+After that, we create a simple sketch that allows us to send commands from the Serial Monitor and display the responses from the module:
+```cpp
+#include <SoftwareSerial.h>
+
+SoftwareSerial wifi(2, 3); 
 
 void setup() {
   Serial.begin(9600);
-  pinMode(3, INPUT);
+  wifi.begin(115200);   
+
+  Serial.println("Enter AT commands:");
 }
 
 void loop() {
-  printPin3State();  // call the function
-  delay(1000);
-}
-``` 
-### Returning Value From Function
-To make a function more powerful and useful, we can allow it to return a value. To do this, we must specify the type of value the function will return. The return type is written before the function name.     
-Let’s build a simple function that reads the distance measured by an ultrasonic sensor and returns it as a value, we will connect the ultrasonic trig pin to arduino pin 9 and the ultrasonic echo pin to arduino pin 10.
-```cpp
-float readDistance(){
-  long duration;
-  float distance;
-  digitalWrite(9, LOW);
-  delayMicroseconds(2);
-  digitalWrite(9, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(9, LOW);
-  duration = pulseIn(10, HIGH);
-  distance = duration * 0.034 / 2;
-  return distance;
+  // Send command from Serial Monitor to Wi-Fi module
+  if (Serial.available()) {
+    wifi.write(Serial.read());
+  }
+
+  // Show response from Wi-Fi module
+  if (wifi.available()) {
+    Serial.write(wifi.read());
+  }
 }
 ```
-Now we can call this function any time we want to retrieve the distance using the ultrasonic sensor.  
-### Functions With Parameters
-The `readDistance` function works well, but it has a limitation. The trigger and echo pins are predefined inside the function. This means that anyone who wants to use this function must connect the ultrasonic sensor to those exact pins. In other words, the function forces a specific hardware configuration.   
-To make the function more flexible and reusable, we can make the pins dynamic. Instead of defining them inside the function, we allow the user to specify which pins to use when calling the function,  This can be achieved by adding parameters to the function.   
-Parameters are declared inside the parentheses `()` of the function definition. For each parameter, we specify the data type followed by the parameter name. These parameters act like variables that receive the values passed when the function is called. Inside the function body, we can then use these parameters just like normal variables.
-
-```cpp
-float readDistance(int trigPin, int echoPin){ 
-	long duration; 
-	float distance; 
-	digitalWrite(trigPin, LOW); 
-	delayMicroseconds(2); 
-	digitalWrite(trigPin, HIGH); 
-	delayMicroseconds(10); 
-	digitalWrite(trigPin, LOW); 
-	duration = pulseIn(echoPin, HIGH); 
-	distance = duration * 0.034 / 2; 
-	return distance; 
-}
-```
-Now, when we call the function, we can specify which pins we are using.
-```cpp
-readDistance(2,3);
-```
-### Variables Scope :
-Inside the `readDistance` function, we created two variables: `duration` and `distance`. If we try to access the values of these variables inside the `loop()` or `setup` function, the compiler will generate an error.   
-This happens because these variables only exist inside the `readDistance` function. They are local variables, which means they are created in memory when the function starts executing and are destroyed from the microcontroller's memory as soon as the function finishes.
-#### Scope :
-In programming, scope refers to the region of a program where a particular variable or function can be accessed.
-- **Global scope:** Any variable created outside of `setup()`, `loop()`, or custom functions belongs to this scope. In Arduino, global variables are often used to store states (e.g., `int buttonPin = 2;`). They can be accessed anywhere in the program, but they consume SRAM constantly, so overusing them can limit available memory.
-- **Local scope:** A variable created inside a function or a block. It is stored temporarily on the stack memory and is freed when the function ends, which is efficient for microcontrollers. Local variables can only be accessed inside the function or block where they were created.  
-### Recursive Funtions :
-Recursive function are special function that have ability to call theirself untill a condition (that we call base state) is valid.  
-lets suppose we want to create a function that calculate factorial of numbers   
-we know that:
-
-- 0! is equal to 1
-- 1! is equal to 1
-- 4 is equal to 4\*3\*2\*1
-- 5! is equal to 5\*4\*3\*2\*1 = 5\*4!
-
-With that in mind, we can set the base condition as if ``n == 0`` we return 1, else we return n multiplied by the factorial of n-1 and so on
-```cpp
-int factorial(int n){
-	if (n == 0){
-		return 1;
-	}else{
-	return n * factorial(n - 1);
-	}
-}
-
-```
-Recursive functions can be very useful for implementing loops behaviour, but we must use them carefully.If a recursive function calls itself repeatedly without a proper stopping condition (base case), or if it is called too many times, it can lead to a stack overflow. This happens because each function call consumes memory on the stack, and exceeding the available stack memory will cause the program to crash.
-### Passing Arguments by Reference in Functions :
-When we pass a variable to a function, we are usually working with a copy of its value. This means that if we modify the variable inside the function, the original variable outside the function remains unchanged.  
-We can solve this problem by using pointers, which allow us to pass a reference to the variable instead of a copy. Instead of sending the value itself, we send the memory address of the variable. This allows the function to access and modify the original value stored in memory.   
-To create this type of parameter, we add `*` after the variable type in the function definition. Inside the function, we can dereference the pointer using the `*` operator to read or modify the value stored at that memory address.    
-Let’s edit the `readDistance` function. We will create the `duration` and `distance` variables outside the function as global variables, then pass them to the function so their values can be modified. This allows the function to update their values while also making them accessible and usable outside the function.
-```cpp
-void readDistance(int trigPin, int echoPin, long *duration, float *distance) {  
-digitalWrite(trigPin, LOW);  
-delayMicroseconds(2);  
-  
-digitalWrite(trigPin, HIGH);  
-delayMicroseconds(10);  
-digitalWrite(trigPin, LOW);  
-  
-*duration = pulseIn(echoPin, HIGH);  
-*distance = (*duration) * 0.034 / 2;  
-}
-```
-And now we can use this function as following
-```cpp
-long duration;  
-float distance;  
-  
-void readDistance(int trigPin, int echoPin, long *duration, float *distance) {  
-	digitalWrite(trigPin, LOW);  
-	delayMicroseconds(2);  
-	digitalWrite(trigPin, HIGH);  
-	delayMicroseconds(10);  
-	digitalWrite(trigPin, LOW);  
-	*duration = pulseIn(echoPin, HIGH);  
-	*distance = (*duration) * 0.034 / 2;  
-}  
-  
-void setup() {  
-	Serial.begin(9600);  
-	pinMode(9, OUTPUT);  
-	pinMode(10, INPUT);  
-}  
-  
-void loop() {  
-	readDistance(9, 10, &duration, &distance);    
-	Serial.print("Duration: ");  
-	Serial.print(duration);  
-	Serial.print(" us | Distance: ");  
-	Serial.print(distance);  
-	Serial.println(" cm");  
-	delay(500);  
-}
-```
-We can notice that when we call the function, we add `&` before the variable name. This is the address-of operator, and it allows us to access the memory address of the variable instead of its value.
-### Higher-Order Functions and Function Pointers 
-When we write functions, we usually pass standard data (like integers, floats, or pointers to variables) as arguments. However, we can also pass other functions as arguments. A function that accepts another function as a parameter, or returns a function as its result, is called a higher-order function.  
-We can achieve this by using function pointers. Just like a normal pointer holds the memory address of a variable, a function pointer holds the memory address of a function. This allows us to decide exactly which function to execute while the program is running, making our code highly flexible.  
-To create a pointer to a function, we must specify its return type, the pointer name enclosed in parentheses with a `*`, and the parameter types it accepts. For example: `void (*actionFunction)(int)` creates a pointer that can point to any function returning `void` and accepting an `int`.    
-Let’s look at a simple example where we create a higher-order function named `controlPin` that takes a pin number and a function pointer to dictate what happens to that pin.  
-```cpp
-void turnOn(int pin) {  
-  digitalWrite(pin, HIGH);
-  Serial.println("Pin is ON");
-}  
-void turnOff(int pin) {  
-  digitalWrite(pin, LOW);
-  Serial.println("Pin is OFF");
-}  
-
-// Higher-order function accepting a function pointer
-void controlPin(int pin, void (*action)(int)) {  
-  action(pin);  
-}
-
-void setup() {  
-  Serial.begin(9600);  
-  pinMode(13, OUTPUT);  
-}  
-  
-void loop() {  
-  controlPin(13, turnOn);    
-  delay(1000);  
-  controlPin(13, turnOff);  
-  delay(1000);  
-}
-```
-We can notice that when we call `controlPin`, we just pass the name of the function (`turnOn` or `turnOff`) without parentheses. In C++, the name of a function automatically acts as a pointer to its memory address, so we don't strictly need to use the `&` operator here.  
-
-We can Also retrun function from our function, this helpfull when we want  a main function that decides which function should run based on some condition (for example: a sensor value, a button press, or a command). This technique helps us create a **function selector**: a main function that chooses and returns the correct function to execute, We can create a function selector by first declaring the **return type** of the functions we intend to return, followed by the selector function's name (preceded by an asterisk `*` and wrapped in parentheses) along with the parameters the selector takes. Finally, we append the parameters that the returned function itself will take at the very end. This structure tells the compiler that our selector isn't just returning a simple value, but a memory address pointing to a specific block of executable code.
-```cpp
-return_type (*functionName(parameters_of_selector))(parameters_of_returned_function)
-```
-Let’s see how this looks in a real script. We will create a selector that chooses between different LED patterns (Slow or Fast) and returns that function to be used in our `loop`.
-```cpp
-void slowBlink(int pin) { 
-	digitalWrite(pin, HIGH); 
-	delay(1000); 
-	digitalWrite(pin, LOW); 
-	delay(1000); 
-} 
-void fastBlink(int pin) { 
-	digitalWrite(pin, HIGH); 
-	delay(200); 
-	digitalWrite(pin, LOW); 
-	delay(200); 
-} 
-void (*selectPattern(char mode))(int) { 
-	if (mode == 'S') return slowBlink; 
-	if (mode == 'F') return fastBlink; 
-	return nullptr; 
-} 
-
-void setup() { 
-	pinMode(13, OUTPUT); 
-} 
-void loop() {
-	(*currentAction)(int) = selectPattern('F');
-	if (currentAction != nullptr) { 
-		currentAction(13); 
-	}
- }
-```
-### Using Function Pointers for a State Machine :
-One of the most powerful and practical uses of function pointers is creating a state machine. Instead of writing a massive `switch...case` or `if...else` block inside our `loop()` to check which state the system is currently in, we can simply create a global function pointer that represents the "current state."   When the system needs to change states, we just update the pointer to point to a new function.   
-To create a **function pointer**, we declare a pointer that matches the return type and parameters of the function we want to reference. The syntax may look unusual at first because the pointer name must be placed inside parentheses with the `*` symbol. This tells the compiler that the variable is a pointer to a function, not a normal function declaration.
-```cpp
-returnType (*pointerName)(parameterTypes);
-```
-Let's write a state machine for an LED that alternates between a "Blinking" state and an "Idle" state based on time.
-```cpp
-
-// 1. Declare a function pointer for the current state 
-void (*currentState)();  
-
-// 2. Define the state functions
-void stateIdle() {  
-  digitalWrite(13, LOW);  
-  Serial.println("State: IDLE. Waiting 3 seconds...");  
-  delay(3000);  
-  // Transition to the Blinking state by updating the pointer
-  currentState = stateBlinking;  
-}  
-
-void stateBlinking() {  
-  Serial.println("State: BLINKING. Blinking 3 times...");  
-  for(int i = 0; i < 3; i++) {
-    digitalWrite(13, HIGH);  
-    delay(250);
-    digitalWrite(13, LOW);
-    delay(250);
-  }
-  // Transition back to the Idle state
-  currentState = stateIdle;  
-}  
-
-void setup() {  
-  Serial.begin(9600);  
-  pinMode(ledPin, OUTPUT);  
-  
-  // Set the initial state when the program starts
-  currentState = stateIdle;  
-}  
-  
-void loop() {  
-  // 3. Execute whatever function the pointer is currently pointing to
-  currentState();  
-}
-```
-By using the State machine approch the `loop()` function become more clean. The program flows naturally from one state to the next simply by reassigning the `currentState` pointer, keeping the logic perfectly organized and modular.
-
-### Functional Programming Concepts:
-Functional programming represent the art of solving our problems by dividing the main problem to small sets of sub problems and creating function for each one of them.  
-Functional programming cover the following 5 concepts
-
-#### Pure functions :
-These functions respect the following :
-
-- They always produce the same output for same arguments irrespective of anything else.
-- They have no side-effects i.e. they do not modify any arguments or local/global variables or input/output.
-- They have immutability. The pure function's only result is the value it returns. They are deterministic.
-
-#### Recursive function :
-Iteration in functional languages is implemented through recursion. Recursive functions repeatedly call themselves until they reache the base case.
-
-#### First-Class functions and Higher-Order function :
-First-class functions are dealt with as first-class variable. The first class variables can be passed to functions as parameter, can be returned from functions or stored in data structures. Higher order functions are the functions that take other functions as arguments and they can also return functions.
-
-#### Referential transparency :
-In functional programs variables, once defined don't change their value throughout the program.   Functional programs do not have assignment statements. If we have to store some value, we define new variables instead. This eliminates any chances of side effects because any variable can be replaced with its actual value at any point of execution. State of any variable is constant at any instant.
-
-#### Variables are Immutable :
-In functional programming, we can't modify a variable after it's been initialized. We can create new variables but we can't modify existing variables, and this really helps to maintain state throughout the runtime of a program. Once we create a variable and set its value, we can have full confidence knowing that the value of that variable will never change.
-### Headers Files :
-Functions allow us to group blocks of code into reusable units. This means we can call these functions multiple times within the same file without duplicating code. However, when other scripts need to use these functions, copying and pasting them into each script is inefficient and error-prone. To solve we use header files. 
-Header files are special files used to store function declarations and type definitions, making them accessible across multiple script files. In our previous lecture, we used some of Arduino header files to include extra libraries that provide functions and support for specific hardware modules.  like  `<LiquidCrystal.h>` , `<LiquidCrystal_I2C.h>`,  `<SoftwareSerial.h>`  and `<Wire.h>`
-
-
-#### Creating a Header File 
-In The Arduino IDE, by, click the small “...” tab in the top right corner above our sketch, then select “New Tab”. A prompt will appear asking for the file name, we can use any name but it should end with `.h`, for example, `myFunctions.h`. This will create a new header file that we can use to declare functions we want to access from our main sketch.
-
-<img src="./attachments/header.png"/>
-
-When defining a header file, there are a few lines that should always be included. First, we use include guards to prevent the header from being included multiple times, which can cause errors. This is done with `#ifndef`, `#define` at the top, and `#endif` at the bottom. Inside these guards, we write function declarations the names, return types, and parameters of the functions we plan to use and optionally define constants or macros that we want to reuse throughout our code.
-
-For example, we can create a header file called `myFunctions.h` to declare a simple LED blinking function. The header file would look like this:
-```cpp
-#ifndef MYFUNCTIONS_H   
-#define MYFUNCTIONS_H  
-  
-// Function declaration  
-void blinkLed(int pin, int delayTime);  
-  
-#endif                  // Include guard end
-```
-The actual function is defined in a separate `.cpp` file, usually with the same name as the header. Following the same steps as before, we create a new tab in Arduino IDE, give it the `.cpp` extension, and put our function definitions inside it.  
-We do this to avoid multiple definition errors. If we put full function definitions directly in the header file and include that header in multiple sketches or `.cpp` files, the compiler may see the same function defined more than once, which causes a linking error. By keeping the definitions in a single `.cpp` file, the compiler knows there is only one copy of each function, while the header simply tells other files the function exists.   
-Giving the `.cpp` file the same name as the header makes the code easier to organize and understand. The header (`.h`) provides the interface (declarations), the `.cpp` provides the implementation (definitions).
-```cpp
-#include <Arduino.h>
-#include "myFunctions.h"  
-
-void blinkLed(int pin, int delayTime) {  
-    digitalWrite(pin, HIGH);  
-    delay(delayTime);  
-    digitalWrite(pin, LOW);  
-    delay(delayTime);  
-}
-```
-Finally, in our main sketch (`sketch.ino`), we include the header file using `#include "myFunctions.h"`. This allows us to call the function anywhere in our sketch without redefining it:
-```cpp
-#include "myFunctions.h"  
-  
-const int ledPin = 13;  
-  
-void setup() {  
-    pinMode(ledPin, OUTPUT);  
-}  
-  
-void loop() {  
-    blinkLed(ledPin, 500);  
-}
-```
+If random or garbled characters appear in the Serial Monitor, it usually means the baud rate of the ESP-01 is mismatched. While 115200 is standard, older firmware versions sometimes use 9600. We can change `wifi.begin(115200)` to `wifi.begin(9600)` to test this.
